@@ -1,6 +1,7 @@
 """Reusable domain logic shared across routers."""
 from __future__ import annotations
 
+import random
 from datetime import date
 
 from sqlalchemy import func, select
@@ -8,6 +9,16 @@ from sqlalchemy.orm import Session
 
 from . import schemas
 from .models import Pick, Situation
+from .players import PLAYERS
+
+# --- 82-0 GM Mode tuning ----------------------------------------------------
+GM_CAP = 32
+GM_ROSTER_SIZE = 5
+GM_POOL_SIZE = 12
+GM_RULES = (
+    f"Build a starting five from your spin. Stay under the {GM_CAP}-point cap. "
+    "You need at least one guard and one center."
+)
 
 
 def options_out(situation: Situation) -> list[schemas.OptionOut]:
@@ -76,6 +87,67 @@ def get_or_assign_daily(db: Session, sport: str, day: date) -> Situation | None:
     if not pool:
         return None
     return pool[day.toordinal() % len(pool)]
+
+
+def _gm_feasible(pool: list[dict]) -> bool:
+    """Is there a legal sub-cap five (>=1 G, >=1 C) buildable from this pool?"""
+    guards = sorted((p for p in pool if p["pos"] == "G"), key=lambda p: p["cost"])
+    centers = sorted((p for p in pool if p["pos"] == "C"), key=lambda p: p["cost"])
+    if not guards or not centers:
+        return False
+    chosen = {guards[0]["id"], centers[0]["id"]}
+    rest = sorted(
+        (p for p in pool if p["id"] not in chosen), key=lambda p: p["cost"]
+    )
+    five = [guards[0], centers[0]] + rest[: GM_ROSTER_SIZE - 2]
+    return len(five) == GM_ROSTER_SIZE and sum(p["cost"] for p in five) <= GM_CAP
+
+
+def gm_spin_pool() -> list[dict]:
+    """Randomized pool guaranteeing a legal lineup is buildable under the cap."""
+    by_pos = {
+        "G": [p for p in PLAYERS if p["pos"] == "G"],
+        "F": [p for p in PLAYERS if p["pos"] == "F"],
+        "C": [p for p in PLAYERS if p["pos"] == "C"],
+    }
+    for _ in range(40):
+        pool = (
+            random.sample(by_pos["G"], 4)
+            + random.sample(by_pos["F"], 4)
+            + random.sample(by_pos["C"], 2)
+        )
+        chosen_ids = {p["id"] for p in pool}
+        leftover = [p for p in PLAYERS if p["id"] not in chosen_ids]
+        pool += random.sample(leftover, GM_POOL_SIZE - len(pool))
+        if _gm_feasible(pool):
+            random.shuffle(pool)
+            return pool
+    # Extremely unlikely; return a known-feasible default sample.
+    return random.sample(PLAYERS, GM_POOL_SIZE)
+
+
+def validate_gm_roster(pool_ids: list[str], player_ids: list[str]) -> tuple[bool, str]:
+    from .players import BY_ID
+
+    if len(player_ids) != GM_ROSTER_SIZE:
+        return False, f"Pick exactly {GM_ROSTER_SIZE} players."
+    if len(set(player_ids)) != len(player_ids):
+        return False, "No duplicate players."
+    pool = set(pool_ids)
+    if not all(pid in pool for pid in player_ids):
+        return False, "You can only pick players from your spin."
+    team = [BY_ID[pid] for pid in player_ids if pid in BY_ID]
+    if len(team) != GM_ROSTER_SIZE:
+        return False, "Unknown player in roster."
+    positions = {p["pos"] for p in team}
+    if "G" not in positions:
+        return False, "Your lineup needs at least one guard."
+    if "C" not in positions:
+        return False, "Your lineup needs at least one center."
+    total = sum(p["cost"] for p in team)
+    if total > GM_CAP:
+        return False, f"Over the cap: {total}/{GM_CAP}."
+    return True, ""
 
 
 def build_reveal(

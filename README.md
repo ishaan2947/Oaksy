@@ -6,7 +6,8 @@ Oaksy is a software-only, fan-focused sports app (no betting). Every day, one
 real game decision drops. You have 30 seconds and a few choices. Then you see
 what the coach actually did, the outcome, an AI-backed verdict, and how you
 stack up against everyone else — and the best arguments fight it out in the
-weekly Debate Arena.
+weekly Debate Arena. Bored on a Tuesday? Build an all-era NBA team in 82-0 GM
+Mode and let Claude rate whether it goes undefeated.
 
 This repo contains a working **v1 MVP**: a Python/FastAPI backend and a React
 (Vite) web frontend, built in the order laid out in the product spec.
@@ -23,9 +24,9 @@ This repo contains a working **v1 MVP**: a Python/FastAPI backend and a React
 | 🏆 **Coach Score** — your running record vs real coaches + rank | ✅ | `backend/app/routers/users.py` |
 | **Shareable result card** — the growth engine, screenshot-worthy | ✅ | `frontend/src/components/ShareCard.jsx` |
 | ⚔️ **Debate Arena** — weekly bracket, vote on the best reasoning | ✅ | `backend/app/routers/debates.py` |
+| 🏀 **82-0 GM Mode** — spin a pool of legends, build an all-era five under a cap, Claude rates it | ✅ | `backend/app/routers/gm.py`, `frontend/src/components/GMMode.jsx` |
 | **Auth** — email/password, JWT (no OAuth in v1) | ✅ | `backend/app/routers/auth.py` |
 | **Data pipeline** — real NFL 4th-down decisions from nflverse | ✅ | `backend/scripts/pull_nfl.py` |
-| 82-0 GM Mode | ⛔ v2 (per spec) | — |
 | Live in-game decisions | ⛔ v2 (needs paid real-time data) | — |
 | Public social feed | ⛔ never (social *mechanics* instead) | — |
 
@@ -152,6 +153,8 @@ production (noted in the script).
 | `GET` | `/api/users/leaderboard` | Top coaches |
 | `GET` | `/api/debate/current` | This week's Debate Arena |
 | `POST` | `/api/debate/posts/{pick_id}/vote` | Upvote a reasoning (toggle) |
+| `POST` | `/api/gm/spin` | Spin a randomized pool of legends (82-0 GM Mode) |
+| `POST` | `/api/gm/submit` | Submit a roster → Claude verdict + score |
 
 Anonymous users can play and vote in the split via a client-generated `anon_id`;
 signing in is what builds a persistent Coach Score and lets you vote in debates.
@@ -166,9 +169,10 @@ Oaksy/
 │  ├─ app/
 │  │  ├─ main.py          # FastAPI app, CORS, startup seeding
 │  │  ├─ models.py        # Situation, User, Pick, DebateVote
-│  │  ├─ routers/         # auth, situations, picks, users, debates
-│  │  ├─ services.py      # community split, daily selection, reveal
-│  │  ├─ ai.py            # Claude verdict (graceful fallback)
+│  │  ├─ routers/         # auth, situations, picks, users, debates, gm
+│  │  ├─ services.py      # community split, daily selection, GM spin/validation
+│  │  ├─ ai.py            # Claude verdicts: Daily Call + GM team (graceful fallback)
+│  │  ├─ players.py       # curated NBA legend pool for GM Mode
 │  │  ├─ seed_data.py     # 10 curated real situations
 │  │  └─ seed.py          # idempotent seeding
 │  ├─ scripts/pull_nfl.py # nflverse data pipeline
@@ -199,5 +203,7 @@ screenshot. No generic AI aesthetic, no chat bubbles, no pastel gradients.
   objectively-sourced situations. Wire a real EPA/WP model into `pull_nfl.py`
   for production-grade "best call" labels.
 - The smoke test (`backend/smoke_test.py`) exercises the whole API end-to-end.
-- Suggested v2, in spec order: 82-0 GM Mode (needs a player DB), live in-game
-  decisions (paid real-time data), React Native mobile (shares this codebase).
+- 82-0 GM Mode ships with a curated pool of ~45 legends (`backend/app/players.py`);
+  swap in a real source (Basketball Reference) to expand it.
+- Suggested v2: live in-game decisions (paid real-time data) and React Native
+  mobile (shares this codebase).

@@ -75,4 +75,12 @@ export const api = {
   debate: () => request("/api/debate/current"),
   vote: (pickId) =>
     request(`/api/debate/posts/${pickId}/vote`, { method: "POST", auth: true }),
+
+  // 82-0 GM Mode
+  gmSpin: () => request("/api/gm/spin", { method: "POST" }),
+  gmSubmit: ({ spin_id, player_ids }) =>
+    request("/api/gm/submit", {
+      method: "POST",
+      body: { spin_id, player_ids, anon_id: getToken() ? null : anonId() },
+    }),
 };

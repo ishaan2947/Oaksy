@@ -92,6 +92,9 @@ class CoachScore(BaseModel):
     beat_coach_count: int
     debate_wins: int
     rank_label: str
+    gm_teams: int = 0
+    gm_rating: float = 0.0     # 0-100 average Claude team score
+    gm_rank_label: str = "Unrated"
 
 
 class LeaderboardEntry(BaseModel):
@@ -125,3 +128,36 @@ class DebateSituationOut(BaseModel):
 class DebateArenaOut(BaseModel):
     week_label: str
     situations: list[DebateSituationOut]
+
+
+# --- 82-0 GM Mode -----------------------------------------------------------
+class PlayerOut(BaseModel):
+    id: str
+    name: str
+    pos: str        # G | F | C
+    era: str
+    cost: int
+    tag: str
+
+
+class SpinOut(BaseModel):
+    spin_id: str
+    cap: int
+    roster_size: int
+    rules: str
+    pool: list[PlayerOut]
+
+
+class GMSubmitRequest(BaseModel):
+    spin_id: str
+    player_ids: list[str] = Field(min_length=1, max_length=8)
+    anon_id: str | None = None
+
+
+class GMResultOut(BaseModel):
+    team: list[PlayerOut]
+    total_cost: int
+    cap: int
+    score: int
+    verdict: str
+    share_line: str

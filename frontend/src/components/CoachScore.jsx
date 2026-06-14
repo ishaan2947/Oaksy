@@ -57,6 +57,16 @@ export default function CoachScore({ user, score, onLogin }) {
             <div className="n">{score.debate_wins}</div>
             <div className="l">Debate votes won</div>
           </div>
+          <div className="score-tile">
+            <div className="n" style={{ color: "var(--blue)" }}>
+              {score.gm_teams > 0 ? score.gm_rating : "—"}
+            </div>
+            <div className="l">GM rating · {score.gm_rank_label}</div>
+          </div>
+          <div className="score-tile">
+            <div className="n">{score.gm_teams}</div>
+            <div className="l">82-0 teams built</div>
+          </div>
         </div>
       </div>
 

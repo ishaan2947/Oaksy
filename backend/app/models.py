@@ -12,6 +12,7 @@ import uuid
 from datetime import date, datetime, timezone
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Date,
     DateTime,
@@ -122,6 +123,36 @@ class Pick(Base):
     votes: Mapped[list["DebateVote"]] = relationship(
         back_populates="pick", cascade="all, delete-orphan"
     )
+
+
+class GMSpin(Base):
+    """A wheel spin in 82-0 GM Mode — the randomized pool you build from."""
+
+    __tablename__ = "gm_spins"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    anon_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    player_ids: Mapped[list[str]] = mapped_column(JSON)  # the pool
+    cap: Mapped[int] = mapped_column(Integer)
+    roster_size: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class GMTeam(Base):
+    """A submitted 82-0 roster and its Claude verdict."""
+
+    __tablename__ = "gm_teams"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    spin_id: Mapped[str] = mapped_column(ForeignKey("gm_spins.id"))
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), index=True, nullable=True)
+    anon_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    player_ids: Mapped[list[str]] = mapped_column(JSON)
+    total_cost: Mapped[int] = mapped_column(Integer)
+    score: Mapped[int] = mapped_column(Integer)  # 0-100
+    verdict: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
 class DebateVote(Base):

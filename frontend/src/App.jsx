@@ -3,12 +3,14 @@ import { api } from "./api";
 import { useAuth } from "./auth";
 import DailyCall from "./components/DailyCall";
 import DebateArena from "./components/DebateArena";
+import GMMode from "./components/GMMode";
 import CoachScore from "./components/CoachScore";
 import AuthModal from "./components/AuthModal";
 
 const TABS = [
   { id: "daily", label: "Daily Call" },
-  { id: "debate", label: "Debate Arena" },
+  { id: "debate", label: "Debate" },
+  { id: "gm", label: "GM Mode" },
   { id: "score", label: "Coach Score" },
 ];
 
@@ -105,6 +107,7 @@ export default function App() {
           onToast={showToast}
         />
       )}
+      {tab === "gm" && <GMMode onSubmitted={refreshScore} onToast={showToast} />}
       {tab === "score" && (
         <CoachScore user={user} score={score} onLogin={() => setShowAuth(true)} />
       )}

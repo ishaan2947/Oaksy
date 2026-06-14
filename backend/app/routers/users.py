@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from .. import schemas
 from ..database import get_db
 from ..deps import get_current_user
-from ..models import DebateVote, Pick, User
+from ..models import DebateVote, GMTeam, Pick, User
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -23,6 +23,20 @@ def _rank_label(win_rate: float, total: int) -> str:
     if win_rate >= 45:
         return "Starter"
     return "Benchwarmer"
+
+
+def _gm_rank_label(rating: float, teams: int) -> str:
+    if teams == 0:
+        return "Unrated"
+    if rating >= 90:
+        return "Hall of Fame"
+    if rating >= 80:
+        return "Elite"
+    if rating >= 70:
+        return "Contender"
+    if rating >= 60:
+        return "Playoff"
+    return "Lottery"
 
 
 def _coach_score(db: Session, user: User) -> schemas.CoachScore:
@@ -53,6 +67,15 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
         or 0
     )
 
+    # GM Mode: number of teams built + average Claude rating.
+    gm_teams = (
+        db.scalar(select(func.count(GMTeam.id)).where(GMTeam.user_id == user.id)) or 0
+    )
+    gm_avg = (
+        db.scalar(select(func.avg(GMTeam.score)).where(GMTeam.user_id == user.id)) or 0
+    )
+    gm_rating = round(float(gm_avg), 1)
+
     win_rate = round((correct / total) * 100, 1) if total else 0.0
     return schemas.CoachScore(
         display_name=user.display_name,
@@ -62,6 +85,9 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
         beat_coach_count=beat,
         debate_wins=debate_wins,
         rank_label=_rank_label(win_rate, total),
+        gm_teams=gm_teams,
+        gm_rating=gm_rating,
+        gm_rank_label=_gm_rank_label(gm_rating, gm_teams),
     )
 
 
