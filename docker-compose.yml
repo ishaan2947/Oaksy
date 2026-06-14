@@ -1,0 +1,22 @@
+# Optional: a local Postgres for Oaksy. SQLite is the zero-setup default, so you
+# only need this if you want to develop against Postgres.
+#
+#   docker compose up -d
+#   # then in backend/.env:
+#   DATABASE_URL=postgresql+psycopg://oaksy:oaksy@localhost:5432/oaksy
+#   # and install the driver:  pip install "psycopg[binary]"
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: oaksy-postgres
+    environment:
+      POSTGRES_USER: oaksy
+      POSTGRES_PASSWORD: oaksy
+      POSTGRES_DB: oaksy
+    ports:
+      - "5432:5432"
+    volumes:
+      - oaksy_pgdata:/var/lib/postgresql/data
+
+volumes:
+  oaksy_pgdata:
