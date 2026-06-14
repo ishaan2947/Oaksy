@@ -5,6 +5,7 @@ import DailyCall from "./components/DailyCall";
 import DebateArena from "./components/DebateArena";
 import GMMode from "./components/GMMode";
 import CoachScore from "./components/CoachScore";
+import Leaderboard from "./components/Leaderboard";
 import AuthModal from "./components/AuthModal";
 
 const TABS = [
@@ -79,41 +80,79 @@ export default function App() {
         </div>
       </header>
 
-      <nav className="tabs">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            className={`tab ${tab === t.id ? "active" : ""}`}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </nav>
+      <div className="shell">
+        <main className="main-col">
+          <nav className="tabs">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                className={`tab ${tab === t.id ? "active" : ""}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </nav>
 
-      {tab === "daily" && (
-        <DailyCall
-          sport={sport}
-          onSport={setSport}
-          coachScore={score}
-          onPicked={refreshScore}
-          onToast={showToast}
-        />
-      )}
-      {tab === "debate" && (
-        <DebateArena
-          user={user}
-          onLogin={() => setShowAuth(true)}
-          onToast={showToast}
-        />
-      )}
-      {tab === "gm" && <GMMode onSubmitted={refreshScore} onToast={showToast} />}
-      {tab === "score" && (
-        <CoachScore user={user} score={score} onLogin={() => setShowAuth(true)} />
-      )}
+          {tab === "daily" && (
+            <DailyCall
+              sport={sport}
+              onSport={setSport}
+              coachScore={score}
+              onPicked={refreshScore}
+              onToast={showToast}
+            />
+          )}
+          {tab === "debate" && (
+            <DebateArena
+              user={user}
+              onLogin={() => setShowAuth(true)}
+              onToast={showToast}
+            />
+          )}
+          {tab === "gm" && <GMMode onSubmitted={refreshScore} onToast={showToast} />}
+          {tab === "score" && (
+            <CoachScore user={user} score={score} onLogin={() => setShowAuth(true)} />
+          )}
+        </main>
+
+        <aside className="rail">
+          <Rail onPlay={() => setTab("daily")} />
+        </aside>
+      </div>
+
+      <footer className="footer">
+        Oaksy<span style={{ color: "var(--accent)" }}>.</span> — the arena where fans
+        out-coach the coach, and settle it with data.
+      </footer>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
       {toast && <div className="toast">{toast}</div>}
     </div>
+  );
+}
+
+function Rail() {
+  return (
+    <>
+      <div className="rail-card">
+        <h4 className="rail-title">How Oaksy works</h4>
+        <ol className="how">
+          <li>
+            <b>Make the call.</b> One real game decision. 30 seconds. 3 choices.
+          </li>
+          <li>
+            <b>See the verdict.</b> What the coach did, the outcome, the data-backed take.
+          </li>
+          <li>
+            <b>Build your score.</b> Out-coach real coaches and climb the board.
+          </li>
+        </ol>
+      </div>
+      <div className="rail-card">
+        <h4 className="rail-title">Top coaches this week</h4>
+        <Leaderboard />
+      </div>
+    </>
   );
 }

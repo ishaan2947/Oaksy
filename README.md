@@ -83,7 +83,20 @@ Open <http://localhost:5173>. The dev server proxies `/api` to the backend, so
 there's no CORS setup to do.
 
 That's it — pick a call, see the verdict, share the card, sign up to track your
-Coach Score, and vote in the Debate Arena.
+Coach Score, and vote in the Debate Arena. The web app is responsive: a focused
+single column on phones, and a two-column layout (game + live sidebar) on laptops
+and monitors.
+
+### 3) Mobile app (optional)
+
+A React Native (Expo) app lives in `mobile/` and talks to the same backend:
+
+```bash
+cd mobile && npm install && npx expo install --fix && npx expo start
+```
+
+Start the backend with `--host 0.0.0.0` so your phone can reach it over Wi-Fi.
+See `mobile/README.md` for details.
 
 ---
 
@@ -184,11 +197,14 @@ Oaksy/
 │  │  └─ seed.py          # idempotent seeding
 │  ├─ scripts/pull_nfl.py # nflverse data pipeline
 │  └─ requirements.txt
-├─ frontend/
+├─ frontend/              # React + Vite web app (responsive)
 │  └─ src/
-│     ├─ App.jsx          # tabs: Daily Call · Debate Arena · Coach Score
+│     ├─ App.jsx          # tabs: Daily Call · Debate · GM Mode · Coach Score
 │     ├─ api.js, auth.jsx
-│     └─ components/       # DailyCall, Timer, RevealCard, ShareCard, …
+│     └─ components/       # DailyCall, Timer, RevealCard, ShareCard, GMMode, …
+├─ mobile/                # React Native (Expo) app — shares this backend
+│  ├─ App.js              # bottom tabs: Daily Call · GM Mode · Coach Score
+│  └─ src/                # api, auth, screens/, components/
 ├─ docker-compose.yml     # optional Postgres
 └─ README.md
 ```

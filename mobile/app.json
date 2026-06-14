@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Oaksy",
+    "slug": "oaksy",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0a0a0c",
+    "splash": {
+      "backgroundColor": "#0a0a0c",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.oaksy.app"
+    },
+    "android": {
+      "package": "com.oaksy.app"
+    },
+    "extra": {
+      "_comment": "Override the API host here if your backend isn't auto-detected. e.g. \"apiBase\": \"http://192.168.1.50:8000\"",
+      "apiBase": ""
+    }
+  }
+}
