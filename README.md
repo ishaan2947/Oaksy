@@ -138,6 +138,13 @@ one-score games), and stores them as Daily-Call situations. The "best call" is a
 transparent, documented heuristic — swap in a real EPA/win-probability model for
 production (noted in the script).
 
+**Grow the GM Mode legend pool** from a CSV (`id,name,pos,era,cost,tag`):
+
+```bash
+python scripts/import_players.py --sources        # list free, legal data sources
+python scripts/import_players.py --csv players.csv  # merge new legends into the wheel
+```
+
 ---
 
 ## API overview
@@ -203,7 +210,9 @@ screenshot. No generic AI aesthetic, no chat bubbles, no pastel gradients.
   objectively-sourced situations. Wire a real EPA/WP model into `pull_nfl.py`
   for production-grade "best call" labels.
 - The smoke test (`backend/smoke_test.py`) exercises the whole API end-to-end.
-- 82-0 GM Mode ships with a curated pool of ~45 legends (`backend/app/players.py`);
-  swap in a real source (Basketball Reference) to expand it.
+- 82-0 GM Mode ships with a curated pool of ~80 legends (`backend/app/players.py`).
+  Grow it from data without touching code: `python scripts/import_players.py --csv players.csv`
+  merges new players (run `--sources` for free, legal data sources). The base pool
+  stays in `players.py`; imports land in `players_custom.json` and auto-load on boot.
 - Suggested v2: live in-game decisions (paid real-time data) and React Native
   mobile (shares this codebase).
