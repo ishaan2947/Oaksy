@@ -8,12 +8,25 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from .config import settings
 
+
+def _normalize_url(url: str) -> str:
+    """Hosts (Render/Heroku) hand out postgres:// URLs that SQLAlchemy maps to
+    psycopg2. Rewrite to the psycopg (v3) driver we actually ship."""
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url[len("postgresql://"):]
+    return url
+
+
+DATABASE_URL = _normalize_url(settings.database_url)
+
 # SQLite needs check_same_thread disabled for FastAPI's threaded request model.
 connect_args = (
-    {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+    {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 )
 
-engine = create_engine(settings.database_url, connect_args=connect_args, future=True)
+engine = create_engine(DATABASE_URL, connect_args=connect_args, future=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 
 

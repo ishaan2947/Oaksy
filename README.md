@@ -134,14 +134,22 @@ ANTHROPIC_API_KEY=sk-ant-...
 New situations (seed + pipeline) get a Claude-written verdict; without a key the
 app uses the stored analytics note. `GET /api/health` reports `ai_enabled`.
 
+Verify the key + model work with one live call:
+
+```bash
+cd backend && python scripts/check_ai.py
+```
+
 ---
 
 ## The data pipeline
 
-Pull real NFL 4th-down decision moments straight from nflverse into the same DB:
+Pull real NFL 4th-down decision moments straight from nflverse into the same DB
+(needs pandas — installed separately to keep the app/image lean):
 
 ```bash
 cd backend
+pip install -r requirements-pipeline.txt
 python scripts/pull_nfl.py --season 2023 --limit 40
 python scripts/pull_nfl.py --season 2023 --limit 40 --ai   # also write Claude verdicts
 ```
@@ -181,6 +189,49 @@ signing in is what builds a persistent Coach Score and lets you vote in debates.
 
 ---
 
+## Tests
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+pytest                       # 36 tests: auth, picks, scoring, streak, GM, debate, waitlist
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the backend suite and a web
+build on every push and PR.
+
+---
+
+## Deploy
+
+The repo ships a **single-image deploy**: a multi-stage `Dockerfile` builds the
+web app and serves it straight from FastAPI, so the API and the site share one
+origin (the frontend's relative `/api` calls just work — no separate host, no
+CORS setup).
+
+**One-click on [Render](https://render.com):** New + → **Blueprint** → point at
+this repo. `render.yaml` provisions a free Postgres and the web service, wires
+`DATABASE_URL`, and generates a `SECRET_KEY`. Add `ANTHROPIC_API_KEY` in the
+dashboard for real Claude verdicts (optional).
+
+**Or any Docker host:**
+
+```bash
+docker build -t oaksy .
+docker run -p 8000:8000 \
+  -e SECRET_KEY=change-me \
+  -e DATABASE_URL=postgresql://user:pass@host:5432/oaksy \
+  -e ANTHROPIC_API_KEY=sk-ant-...   # optional \
+  oaksy
+# → http://localhost:8000  (app + landing + API, one origin)
+```
+
+`DATABASE_URL` accepts the `postgres://` / `postgresql://` URLs hosts hand out —
+the app rewrites them to the bundled psycopg 3 driver automatically. Point the
+**mobile** app at the deployed URL via `expo.extra.apiBase` in `mobile/app.json`.
+
+---
+
 ## Project layout
 
 ```
@@ -189,23 +240,27 @@ Oaksy/
 │  ├─ app/
 │  │  ├─ main.py          # FastAPI app, CORS, startup seeding
 │  │  ├─ models.py        # Situation, User, Pick, DebateVote
-│  │  ├─ routers/         # auth, situations, picks, users, debates, gm
+│  │  ├─ routers/         # auth, situations, picks, users, debates, gm, waitlist
 │  │  ├─ services.py      # community split, daily selection, GM spin/validation
 │  │  ├─ ai.py            # Claude verdicts: Daily Call + GM team (graceful fallback)
 │  │  ├─ players.py       # curated NBA legend pool for GM Mode
 │  │  ├─ seed_data.py     # 10 curated real situations
 │  │  └─ seed.py          # idempotent seeding
-│  ├─ scripts/pull_nfl.py # nflverse data pipeline
-│  └─ requirements.txt
+│  ├─ scripts/           # pull_nfl.py, import_players.py, check_ai.py
+│  ├─ tests/             # pytest suite (36 tests)
+│  └─ requirements*.txt  # app · -dev (pytest) · -pipeline (pandas)
 ├─ frontend/              # React + Vite web app (responsive)
+│  ├─ index.html  landing.html   # the app + the marketing/waitlist page
 │  └─ src/
 │     ├─ App.jsx          # tabs: Daily Call · Debate · GM Mode · Coach Score
-│     ├─ api.js, auth.jsx
+│     ├─ landing.jsx      # the waitlist landing page
 │     └─ components/       # DailyCall, Timer, RevealCard, ShareCard, GMMode, …
 ├─ mobile/                # React Native (Expo) app — shares this backend
-│  ├─ App.js              # bottom tabs: Daily Call · GM Mode · Coach Score
+│  ├─ App.js              # bottom tabs: Daily · Debate · GM Mode · Score
 │  └─ src/                # api, auth, screens/, components/
-├─ docker-compose.yml     # optional Postgres
+├─ Dockerfile             # single-image deploy (web built + served by FastAPI)
+├─ render.yaml            # one-click Render blueprint (+ Postgres)
+├─ docker-compose.yml     # optional local Postgres
 └─ README.md
 ```
 

@@ -10,9 +10,9 @@ python-multipart==0.0.20
 anthropic==0.42.0
 httpx==0.28.1
 
-# --- Data pipeline (scripts/pull_nfl.py) ---
-# pandas reads nflverse play-by-play CSV.gz directly; only needed to run the pipeline.
-pandas==2.2.3
+# Postgres driver (psycopg 3). Harmless for SQLite dev; required for a
+# Postgres DATABASE_URL in production.
+psycopg[binary]==3.2.3
 
-# --- Postgres driver (optional; SQLite is the default dev DB) ---
-# psycopg[binary]==3.2.3
+# --- Data pipeline (scripts/pull_nfl.py) lives in requirements-pipeline.txt
+#     (pandas is heavy and only needed to run the pipeline, not the app). ---

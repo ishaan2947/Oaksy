@@ -1,0 +1,16 @@
+# Keep the build context small and avoid leaking local state.
+**/node_modules
+**/.venv
+**/__pycache__
+**/*.pyc
+**/dist
+**/.expo
+**/*.db
+**/*.sqlite3
+**/.env
+backend/.env
+frontend/.env
+.git
+.github
+mobile
+*.md

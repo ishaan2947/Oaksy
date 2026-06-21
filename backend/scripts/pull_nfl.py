@@ -8,8 +8,9 @@ Usage (from the backend/ directory):
     python scripts/pull_nfl.py --season 2023 --limit 40
     python scripts/pull_nfl.py --season 2023 --limit 40 --ai   # also write Claude verdicts
 
-Requires pandas (in requirements.txt). The "best call" here is a transparent,
-documented heuristic — swap in a real EPA/win-probability model for production.
+Requires pandas:  pip install -r requirements-pipeline.txt
+The "best call" here is a transparent, documented heuristic — swap in a real
+EPA/win-probability model for production.
 """
 from __future__ import annotations
 

@@ -1,0 +1,4 @@
+# Extra deps to run the nflverse data pipeline (scripts/pull_nfl.py).
+# Not needed to run the app or the tests — keep these out of the prod image.
+-r requirements.txt
+pandas==2.2.3
