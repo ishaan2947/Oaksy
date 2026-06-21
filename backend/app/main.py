@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import __version__
 from .config import settings
-from .routers import auth, debates, gm, picks, situations, users
+from .routers import auth, debates, gm, picks, situations, users, waitlist
 from .seed import create_tables, seed_situations
 
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +45,7 @@ app.include_router(picks.router)
 app.include_router(users.router)
 app.include_router(debates.router)
 app.include_router(gm.router)
+app.include_router(waitlist.router)
 
 
 @app.get("/api/health", tags=["health"])

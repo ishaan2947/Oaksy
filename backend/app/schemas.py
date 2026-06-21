@@ -162,3 +162,19 @@ class GMResultOut(BaseModel):
     score: int
     verdict: str
     share_line: str
+
+
+# --- Waitlist ---------------------------------------------------------------
+class WaitlistRequest(BaseModel):
+    email: EmailStr
+    source: str | None = Field(default=None, max_length=60)
+
+
+class WaitlistOut(BaseModel):
+    ok: bool
+    already: bool
+    count: int
+
+
+class WaitlistCount(BaseModel):
+    count: int

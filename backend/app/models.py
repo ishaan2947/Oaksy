@@ -155,6 +155,17 @@ class GMTeam(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class WaitlistEntry(Base):
+    """A pre-launch / mobile-beta email signup from the landing page."""
+
+    __tablename__ = "waitlist"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    email: Mapped[str] = mapped_column(String, unique=True, index=True)
+    source: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class DebateVote(Base):
     """An upvote on a pick's reasoning in the weekly Debate Arena."""
 

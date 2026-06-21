@@ -129,6 +129,10 @@ export default function App() {
       <footer className="footer">
         Oaksy<span style={{ color: "var(--accent)" }}>.</span> — the arena where fans
         out-coach the coach, and settle it with data.
+        {" · "}
+        <a href="/landing.html" style={{ color: "var(--gold)" }}>
+          Get launch updates
+        </a>
       </footer>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
