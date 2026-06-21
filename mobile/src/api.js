@@ -102,6 +102,9 @@ export const api = {
   myScore: () => request("/api/users/me/score", { auth: true }),
   leaderboard: () => request("/api/users/leaderboard"),
 
+  debate: () => request("/api/debate/current"),
+  vote: (pickId) => request(`/api/debate/posts/${pickId}/vote`, { method: "POST", auth: true }),
+
   gmSpin: () => request("/api/gm/spin", { method: "POST" }),
   gmSubmit: ({ spin_id, player_ids }) =>
     request("/api/gm/submit", {

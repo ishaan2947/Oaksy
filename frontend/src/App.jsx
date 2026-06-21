@@ -61,6 +61,11 @@ export default function App() {
               >
                 {score ? (
                   <>
+                    {score.current_streak > 0 && (
+                      <span title={`${score.current_streak}-day streak`}>
+                        🔥{score.current_streak}
+                      </span>
+                    )}
                     <span>Coach Score</span>
                     <b>{score.win_rate}%</b>
                   </>

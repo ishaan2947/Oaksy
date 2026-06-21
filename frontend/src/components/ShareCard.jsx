@@ -51,7 +51,9 @@ export default function ShareCard({ reveal, options, coachScore, onToast }) {
     const score = coachScore
       ? ` My Coach Score: ${coachScore.win_rate}% (${coachScore.rank_label}).`
       : "";
-    return `${lead}${detail}${score} oaksyapp.com`;
+    const streak =
+      coachScore?.current_streak > 1 ? ` 🔥 ${coachScore.current_streak}-day streak.` : "";
+    return `${lead}${detail}${score}${streak} oaksyapp.com`;
   }
 
   async function copy() {
@@ -95,8 +97,10 @@ export default function ShareCard({ reveal, options, coachScore, onToast }) {
             <div className="l">Times beat the coach</div>
           </div>
           <div className="stat">
-            <div className="n">{coachScore ? coachScore.rank_label : "Rookie"}</div>
-            <div className="l">Rank</div>
+            <div className="n">
+              {coachScore?.current_streak > 0 ? `🔥${coachScore.current_streak}` : "—"}
+            </div>
+            <div className="l">Day streak</div>
           </div>
         </div>
         <div className="watermark">Oaksy<span style={{ color: "var(--accent)" }}>.</span></div>

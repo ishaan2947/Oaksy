@@ -44,6 +44,14 @@ export default function CoachScore({ user, score, onLogin }) {
             <div className="l">Win rate vs coaches</div>
           </div>
           <div className="score-tile">
+            <div className="n" style={{ color: "var(--accent)" }}>
+              {score.current_streak > 0 ? `🔥 ${score.current_streak}` : "—"}
+            </div>
+            <div className="l">
+              Day streak{score.longest_streak > 0 ? ` · best ${score.longest_streak}` : ""}
+            </div>
+          </div>
+          <div className="score-tile">
             <div className="n" style={{ color: "var(--gold)" }}>
               {score.beat_coach_count}
             </div>

@@ -208,8 +208,10 @@ function Reveal({ options, reveal, coachScore, onToast }) {
       ? ` I ${yourLabel.toLowerCase()}. ${agree}% of fans agreed.`
       : "";
     const sc = coachScore ? ` Coach Score: ${coachScore.win_rate}%.` : "";
+    const streak =
+      coachScore?.current_streak > 1 ? ` 🔥 ${coachScore.current_streak}-day streak.` : "";
     try {
-      await Share.share({ message: `${lead}${detail}${sc} oaksyapp.com` });
+      await Share.share({ message: `${lead}${detail}${sc}${streak} oaksyapp.com` });
     } catch (e) {
       onToast?.("Share failed.");
     }

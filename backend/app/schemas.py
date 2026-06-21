@@ -92,6 +92,8 @@ class CoachScore(BaseModel):
     beat_coach_count: int
     debate_wins: int
     rank_label: str
+    current_streak: int = 0    # consecutive days with a Daily Call
+    longest_streak: int = 0
     gm_teams: int = 0
     gm_rating: float = 0.0     # 0-100 average Claude team score
     gm_rank_label: str = "Unrated"

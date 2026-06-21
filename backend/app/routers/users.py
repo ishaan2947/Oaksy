@@ -1,6 +1,8 @@
 """Coach Score (identity layer) and the weekly leaderboard."""
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
@@ -23,6 +25,31 @@ def _rank_label(win_rate: float, total: int) -> str:
     if win_rate >= 45:
         return "Starter"
     return "Benchwarmer"
+
+
+def _streaks(pick_dates: list[date]) -> tuple[int, int]:
+    """Return (current, longest) run of consecutive days from a list of dates."""
+    days = sorted(set(pick_dates))
+    if not days:
+        return 0, 0
+
+    longest = run = 1
+    for prev, cur in zip(days, days[1:]):
+        run = run + 1 if cur - prev == timedelta(days=1) else 1
+        longest = max(longest, run)
+
+    # Current streak counts back from the most recent day, but only "alive" if the
+    # last play was today or yesterday (a full missed day breaks it).
+    today = date.today()
+    if days[-1] not in (today, today - timedelta(days=1)):
+        return 0, longest
+    current = 1
+    for prev, cur in zip(reversed(days), reversed(days[:-1])):
+        if prev - cur == timedelta(days=1):
+            current += 1
+        else:
+            break
+    return current, longest
 
 
 def _gm_rank_label(rating: float, teams: int) -> str:
@@ -76,6 +103,12 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
     )
     gm_rating = round(float(gm_avg), 1)
 
+    # Streak: distinct days the user made a Daily Call.
+    pick_dts = db.scalars(
+        select(Pick.created_at).where(Pick.user_id == user.id)
+    ).all()
+    current_streak, longest_streak = _streaks([dt.date() for dt in pick_dts if dt])
+
     win_rate = round((correct / total) * 100, 1) if total else 0.0
     return schemas.CoachScore(
         display_name=user.display_name,
@@ -85,6 +118,8 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
         beat_coach_count=beat,
         debate_wins=debate_wins,
         rank_label=_rank_label(win_rate, total),
+        current_streak=current_streak,
+        longest_streak=longest_streak,
         gm_teams=gm_teams,
         gm_rating=gm_rating,
         gm_rank_label=_gm_rank_label(gm_rating, gm_teams),

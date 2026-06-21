@@ -27,6 +27,11 @@ export default function ScoreScreen({ user, score, onLogin }) {
           </View>
           <View style={styles.grid}>
             <Tile n={`${score.win_rate}%`} l="Win rate vs coaches" color={C.green} />
+            <Tile
+              n={score.current_streak > 0 ? `🔥 ${score.current_streak}` : "—"}
+              l={`Day streak${score.longest_streak > 0 ? ` · best ${score.longest_streak}` : ""}`}
+              color={C.accent}
+            />
             <Tile n={score.beat_coach_count} l="Beat the coach" color={C.gold} />
             <Tile n={score.total_calls} l="Calls made" />
             <Tile n={score.debate_wins} l="Debate votes won" />

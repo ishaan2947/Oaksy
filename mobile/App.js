@@ -12,15 +12,17 @@ import { AuthProvider, useAuth } from "./src/auth";
 import { api } from "./src/api";
 import { C } from "./src/theme";
 import DailyCallScreen from "./src/screens/DailyCallScreen";
+import DebateScreen from "./src/screens/DebateScreen";
 import GMScreen from "./src/screens/GMScreen";
 import ScoreScreen from "./src/screens/ScoreScreen";
 import AuthSheet from "./src/components/AuthSheet";
 import Toast from "./src/components/Toast";
 
 const TABS = [
-  { id: "daily", label: "Daily Call", icon: "🏈" },
+  { id: "daily", label: "Daily", icon: "🏈" },
+  { id: "debate", label: "Debate", icon: "⚔️" },
   { id: "gm", label: "GM Mode", icon: "🏀" },
-  { id: "score", label: "Coach Score", icon: "🏆" },
+  { id: "score", label: "Score", icon: "🏆" },
 ];
 
 function Shell() {
@@ -82,6 +84,13 @@ function Shell() {
       <View style={{ flex: 1 }}>
         {tab === "daily" && (
           <DailyCallScreen coachScore={score} onPicked={refreshScore} onToast={showToast} />
+        )}
+        {tab === "debate" && (
+          <DebateScreen
+            user={user}
+            onLogin={() => setShowAuth(true)}
+            onToast={showToast}
+          />
         )}
         {tab === "gm" && <GMScreen onSubmitted={refreshScore} onToast={showToast} />}
         {tab === "score" && (
