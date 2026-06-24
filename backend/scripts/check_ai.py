@@ -47,11 +47,11 @@ def main() -> int:
             ],
         )
         text = "".join(b.text for b in resp.content if b.type == "text").strip()
-        print("\n✅ Claude responded — the AI verdict path is live.\n")
+        print("\n[OK] Claude responded -- the AI verdict path is live.\n")
         print("   " + text.replace("\n", "\n   "))
         return 0
     except Exception as exc:  # auth, model, network
-        print(f"\n❌ Claude call failed: {exc}")
+        print(f"\n[FAILED] Claude call failed: {exc}")
         print("   Check the key, the model id (AI_MODEL), and network access.")
         print("   The app still runs — it falls back to the analytics verdict.")
         return 1

@@ -30,7 +30,7 @@ This repo contains a working **v1 MVP**: a Python/FastAPI backend and a React
 | Live in-game decisions | ⛔ v2 (needs paid real-time data) | — |
 | Public social feed | ⛔ never (social *mechanics* instead) | — |
 
-The app ships seeded with **10 curated, real decision moments** (NFL + NBA) so it
+The app ships seeded with **15 curated, real decision moments** (NFL + NBA) so it
 has rich content the moment you boot it.
 
 ---
@@ -68,7 +68,7 @@ uvicorn app.main:app --reload --port 8000
 ```
 
 The API comes up at <http://localhost:8000>, auto-creates the SQLite DB, and
-seeds the 10 curated situations on first boot. Interactive API docs:
+seeds the 15 curated situations on first boot. Interactive API docs:
 <http://localhost:8000/docs>.
 
 ### 2) Frontend (terminal B)
@@ -244,7 +244,7 @@ Oaksy/
 │  │  ├─ services.py      # community split, daily selection, GM spin/validation
 │  │  ├─ ai.py            # Claude verdicts: Daily Call + GM team (graceful fallback)
 │  │  ├─ players.py       # curated NBA legend pool for GM Mode
-│  │  ├─ seed_data.py     # 10 curated real situations
+│  │  ├─ seed_data.py     # 15 curated real situations
 │  │  └─ seed.py          # idempotent seeding
 │  ├─ scripts/           # pull_nfl.py, import_players.py, check_ai.py
 │  ├─ tests/             # pytest suite (36 tests)

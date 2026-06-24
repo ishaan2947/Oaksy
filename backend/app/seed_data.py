@@ -153,6 +153,128 @@ SEED_SITUATIONS: list[dict] = [
             "essentially ends it. The numbers backed going for it even though it failed."
         ),
     },
+    {
+        "sport": "NFL",
+        "season": 2009,
+        "week": "Super Bowl XLIV",
+        "game_id": "nfl_2009_sb_NO_vs_IND",
+        "situation_description": (
+            "Super Bowl, opening the second half, trailing the Colts 10-6. You're "
+            "lining up to kick off to Peyton Manning. Play it straight or gamble?"
+        ),
+        "option_a": "Call a surprise onside kick",
+        "option_b": "Kick it deep and trust your defense",
+        "option_c": None,
+        "actual_call": "a",
+        "best_call": "a",
+        "outcome": (
+            "New Orleans called the 'Ambush' onside kick, recovered it, scored on the "
+            "drive, seized the momentum, and won the Super Bowl."
+        ),
+        "analytics_verdict": (
+            "Stealing a possession from Peyton Manning is worth the risk on the game's "
+            "biggest stage. The surprise gave the Saints an extra drive and flipped the "
+            "momentum — a gutsy, high-upside call that paid off."
+        ),
+    },
+    {
+        "sport": "NFL",
+        "season": 2002,
+        "week": "Week 12",
+        "game_id": "nfl_2002_DET_vs_CHI_ot",
+        "situation_description": (
+            "You just won the overtime coin toss. It's sudden death — first score wins. "
+            "There's a stiff wind at one end. What do you do?"
+        ),
+        "option_a": "Take the ball",
+        "option_b": "Kick off and defend with the wind",
+        "option_c": None,
+        "actual_call": "b",
+        "best_call": "a",
+        "outcome": (
+            "Detroit gave the ball away to take the wind. The Bears drove down, kicked "
+            "the winning field goal, and the Lions never touched the ball."
+        ),
+        "analytics_verdict": (
+            "In sudden death, possession is everything — the team with the ball can end "
+            "it without the other side ever touching it. Handing away the ball for a "
+            "field-position edge was a math error that cost the game."
+        ),
+    },
+    {
+        "sport": "NFL",
+        "season": 2012,
+        "week": "Divisional Round",
+        "game_id": "nfl_2012_div_BAL_vs_DEN",
+        "situation_description": (
+            "Tied game, your ball at your own 20, 31 seconds left, two timeouts, and "
+            "Peyton Manning at quarterback. Push for a winning field goal, or sit on it?"
+        ),
+        "option_a": "Go for the winning field goal",
+        "option_b": "Kneel and play for overtime",
+        "option_c": None,
+        "actual_call": "b",
+        "best_call": "a",
+        "outcome": (
+            "Denver kneeled and went to overtime, then lost on a long Baltimore field "
+            "goal — the 'Mile High Miracle' — without Manning getting another shot."
+        ),
+        "analytics_verdict": (
+            "Thirty-one seconds and two timeouts with Peyton Manning is plenty to flip "
+            "into field-goal range. Playing for overtime threw away a real chance to win "
+            "it in regulation."
+        ),
+    },
+    {
+        "sport": "NFL",
+        "season": 2014,
+        "week": "NFC Championship",
+        "game_id": "nfl_2014_nfcc_SEA_vs_GB",
+        "situation_description": (
+            "NFC Championship, early, on the road. 4th-and-goal inches from the end "
+            "zone. Take the automatic three, or go for the touchdown?"
+        ),
+        "option_a": "Kick the chip-shot field goal",
+        "option_b": "Go for the touchdown",
+        "option_c": None,
+        "actual_call": "a",
+        "best_call": "b",
+        "outcome": (
+            "Green Bay settled for field goals near the goal line instead of touchdowns. "
+            "Those missing points loomed huge as Seattle stormed back to win in overtime."
+        ),
+        "analytics_verdict": (
+            "From the 1, the touchdown probability is high and the points swing is "
+            "enormous. Repeatedly taking three instead of seven left the door open — and "
+            "Seattle walked through it."
+        ),
+    },
+    {
+        "sport": "NFL",
+        "season": 2011,
+        "week": "Super Bowl XLVI",
+        "game_id": "nfl_2011_sb_NYG_vs_NE",
+        "situation_description": (
+            "Super Bowl, down 2, just over a minute left. The Giants have 1st-and-goal "
+            "at your 6 and can run the clock down to kick the winning field goal as time "
+            "expires. What's your move?"
+        ),
+        "option_a": "Let them score so you get the ball back with time",
+        "option_b": "Defend the goal line and try to force a field goal",
+        "option_c": None,
+        "actual_call": "a",
+        "best_call": "a",
+        "outcome": (
+            "New England let the Giants score on purpose, getting the ball back with ~57 "
+            "seconds. The comeback drive fell short on a Hail Mary — but the call itself "
+            "was the right one."
+        ),
+        "analytics_verdict": (
+            "Stopping them just lets the clock bleed to zero before a chip-shot winner. "
+            "Letting them score is counterintuitive but correct — it buys your offense "
+            "the only thing that can win the game: time."
+        ),
+    },
     # ---------------------------- NBA ----------------------------
     {
         "sport": "NBA",
