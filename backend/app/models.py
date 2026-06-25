@@ -155,6 +155,20 @@ class GMTeam(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class FeedbackEntry(Base):
+    """A quick in-app feedback poll response from a tester."""
+
+    __tablename__ = "feedback"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    rating: Mapped[str] = mapped_column(String)  # "yes" | "maybe" | "no"
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    anon_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    source: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class WaitlistEntry(Base):
     """A pre-launch / mobile-beta email signup from the landing page."""
 

@@ -76,6 +76,13 @@ export const api = {
   vote: (pickId) =>
     request(`/api/debate/posts/${pickId}/vote`, { method: "POST", auth: true }),
 
+  // Feedback poll
+  feedback: ({ rating, comment }) =>
+    request("/api/feedback", {
+      method: "POST",
+      body: { rating, comment, source: "app", anon_id: getToken() ? null : anonId() },
+    }),
+
   // 82-0 GM Mode
   gmSpin: () => request("/api/gm/spin", { method: "POST" }),
   gmSubmit: ({ spin_id, player_ids }) =>

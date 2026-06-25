@@ -7,6 +7,7 @@ import GMMode from "./components/GMMode";
 import CoachScore from "./components/CoachScore";
 import Leaderboard from "./components/Leaderboard";
 import AuthModal from "./components/AuthModal";
+import FeedbackWidget from "./components/FeedbackWidget";
 
 const TABS = [
   { id: "daily", label: "Daily Call" },
@@ -136,6 +137,7 @@ export default function App() {
       </footer>
 
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      <FeedbackWidget />
       {toast && <div className="toast">{toast}</div>}
     </div>
   );

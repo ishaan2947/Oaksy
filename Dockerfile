@@ -23,5 +23,6 @@ COPY --from=web /web/dist ./static
 ENV STATIC_DIR=/app/static
 
 EXPOSE 8000
-# Render/Heroku-style: bind to $PORT if provided, else 8000.
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Bind to $PORT if provided (Render/Heroku), else 8000. WEB_CONCURRENCY controls
+# worker processes — default 2; bump it on a larger instance for more headroom.
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WEB_CONCURRENCY:-2}"]

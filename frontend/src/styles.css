@@ -140,8 +140,14 @@ a { color: var(--blue); }
 
 .situation {
   font-size: clamp(20px, 4.6vw, 24px); line-height: 1.32; font-weight: 800;
-  letter-spacing: -0.02em; margin: 4px 0 22px;
+  letter-spacing: -0.02em; margin: 4px 0 14px;
 }
+.frame-note {
+  background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--blue);
+  border-radius: 10px; padding: 10px 13px; margin-bottom: 18px;
+  font-size: 13px; line-height: 1.45; color: var(--ink-dim);
+}
+.frame-note b { color: var(--ink); font-weight: 700; }
 
 .options { display: grid; gap: 10px; }
 .option {
@@ -507,3 +513,72 @@ a.btn { text-decoration: none; display: inline-block; }
   .lp-steps { grid-template-columns: 1fr; }
   .lp-mode-grid { grid-template-columns: 1fr; }
 }
+
+/* Landing — worked example (one full real call, front and center) */
+.lp-example { max-width: 620px; margin: 8px auto 44px; }
+.lp-example-tag {
+  text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--gold); font-weight: 800; margin-bottom: 12px;
+}
+.we-card {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 20px;
+  box-shadow: var(--shadow);
+}
+.we-q { font-size: 18px; font-weight: 800; line-height: 1.35; letter-spacing: -0.01em; margin-bottom: 16px; }
+.we-opt {
+  display: flex; align-items: center; gap: 12px; background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 11px; padding: 13px 15px; margin-bottom: 9px;
+  font-size: 15px; font-weight: 600;
+}
+.we-opt.best { border-color: var(--green); background: var(--green-deep); }
+.we-key {
+  width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 6px;
+  background: var(--bg); border: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--ink-dim);
+}
+.we-badge {
+  margin-left: auto; font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 3px 8px; border-radius: 6px;
+}
+.we-badge.coach { background: var(--blue); color: #04203a; }
+.we-badge.data { background: var(--green); color: #06210f; }
+.we-reveal { margin-top: 14px; font-size: 14.5px; line-height: 1.5; color: var(--ink-dim); }
+.we-reveal b { color: var(--ink); }
+.we-verdict {
+  margin-top: 12px; background: var(--panel-2); border: 1px solid var(--line);
+  border-left: 3px solid var(--gold); border-radius: 10px; padding: 12px 14px;
+  color: var(--ink); font-size: 14.5px; line-height: 1.5;
+}
+.lp-example-foot { text-align: center; color: var(--ink-dim); font-size: 14px; margin-top: 16px; }
+
+/* ----------------------------- Feedback widget -------------------------- */
+.fb-fab {
+  position: fixed; right: 18px; bottom: 18px; z-index: 55;
+  background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 999px; padding: 10px 16px; font-weight: 700; font-size: 14px;
+  box-shadow: var(--shadow);
+}
+.fb-fab:hover { border-color: var(--gold); }
+.fb-pop {
+  position: fixed; right: 18px; bottom: 18px; z-index: 56; width: 300px; max-width: calc(100vw - 36px);
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px; box-shadow: var(--shadow); animation: risein 0.2s ease;
+}
+.fb-x {
+  position: absolute; top: 8px; right: 10px; background: none; border: none;
+  color: var(--ink-faint); font-size: 20px; line-height: 1;
+}
+.fb-q { font-weight: 800; font-size: 16px; margin-bottom: 12px; letter-spacing: -0.01em; }
+.fb-opts { display: flex; gap: 8px; margin-bottom: 12px; }
+.fb-opt {
+  flex: 1; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink-dim);
+  border-radius: 10px; padding: 9px 0; font-weight: 700; font-size: 14px;
+}
+.fb-opt.sel { border-color: var(--gold); color: var(--gold); }
+.fb-comment {
+  width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--ink);
+  border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit;
+  resize: vertical; min-height: 48px; margin-bottom: 12px;
+}
+.fb-submit { width: 100%; }
+.fb-thanks { font-weight: 700; line-height: 1.5; color: var(--ink); padding: 6px 0; }

@@ -8,6 +8,7 @@ from __future__ import annotations
 import logging
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from . import ai
 from .database import Base, SessionLocal, engine
@@ -56,8 +57,11 @@ def seed_situations(generate_ai: bool = True) -> int:
                     analytics=row["analytics_verdict"],
                 )
             db.add(situation)
-            added += 1
-        db.commit()
+            try:
+                db.commit()  # commit per row so a race (multi-worker boot) is safe
+                added += 1
+            except IntegrityError:
+                db.rollback()  # another worker inserted this one first — fine
     return added
 
 

@@ -275,6 +275,20 @@ screenshot. No generic AI aesthetic, no chat bubbles, no pastel gradients.
 
 ---
 
+## Content roadmap (from real user feedback)
+
+A public Reddit post (13k views) gave a clear content signal on which sports have
+clean, bingeable decision moments:
+
+1. **NFL — first.** Cleanest structure: the coach literally pauses to make one
+   specific call. The stranger test runs **NFL-only** (the sport toggle is hidden
+   in `DailyCall.jsx` — re-add `"NBA"` to `SPORTS` to restore it).
+2. **MLB — strongest v2 (ranked above NBA).** Multiple commenters independently
+   flagged baseball's clean decision points: pitching changes, pinch hitters,
+   intentional walks, bunt vs. swing, infield in vs. back.
+3. **NBA — later, and only with genuinely binary situations** (foul up 3, play
+   D), not mushy general strategy. The early NBA strategy cards tested as "mushy."
+
 ## Notes & next steps
 
 - **Curated seed data** is simplified for a fan audience; the pipeline produces

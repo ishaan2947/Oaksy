@@ -55,9 +55,13 @@ function Landing() {
           <span className="lp-h1-accent">Settle it with data.</span>
         </h1>
         <p className="lp-sub">
-          Every day, one real game decision drops. You get 30 seconds and three
-          choices. Then you see what the coach actually did, the outcome, an
-          AI-backed verdict, and how you stack up against every other fan.
+          Every day, one real game decision drops — go for it, punt, kick? You pick
+          in 30 seconds, then see what the coach actually did, the real outcome, and
+          whether the data backed the call. The verdict isn't opinion: it's from{" "}
+          <b style={{ color: "var(--ink)" }}>
+            win-probability models across thousands of similar games
+          </b>
+          .
         </p>
 
         <form className="lp-form" onSubmit={submit}>
@@ -83,6 +87,8 @@ function Landing() {
           </div>
         )}
       </section>
+
+      <WorkedExample />
 
       <section className="lp-steps">
         <Step n="1" title="Make the call">
@@ -119,6 +125,41 @@ function Landing() {
         out-coach the coach, and settle it with data.
       </footer>
     </div>
+  );
+}
+
+function WorkedExample() {
+  return (
+    <section className="lp-example">
+      <div className="lp-example-tag">Here's a real one</div>
+      <div className="we-card">
+        <div className="we-q">
+          Divisional Round. You just took the lead with 13 seconds left, kicking off
+          to Patrick Mahomes — who has all three timeouts. How do you kick it?
+        </div>
+        <div className="we-opt">
+          <span className="we-key">A</span> Kick it deep, normal kickoff
+          <span className="we-badge coach">Coach did this</span>
+        </div>
+        <div className="we-opt best">
+          <span className="we-key">B</span> Squib / pooch kick to bleed the clock
+          <span className="we-badge data">Data says</span>
+        </div>
+        <div className="we-reveal">
+          <b>What happened:</b> Buffalo kicked it deep. Mahomes reached field-goal
+          range in 13 seconds, tied it, and Kansas City won in overtime.
+          <div className="we-verdict">
+            The models screamed squib: every second you bleed is a second the league's
+            most dangerous closer can't use. Kicking deep handed him a clean catch with
+            the clock stopped — the worst-case setup.
+          </div>
+        </div>
+      </div>
+      <div className="lp-example-foot">
+        That's one day. There's a fresh call every morning — plus a Debate Arena and an
+        82-0 GM Mode inside.
+      </div>
+    </section>
   );
 }
 

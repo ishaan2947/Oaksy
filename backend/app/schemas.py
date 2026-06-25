@@ -178,3 +178,18 @@ class WaitlistOut(BaseModel):
 
 class WaitlistCount(BaseModel):
     count: int
+
+
+# --- Feedback poll ----------------------------------------------------------
+class FeedbackRequest(BaseModel):
+    rating: str = Field(pattern="^(yes|maybe|no)$")
+    comment: str | None = Field(default=None, max_length=1000)
+    anon_id: str | None = None
+    source: str | None = Field(default=None, max_length=60)
+
+
+class FeedbackSummary(BaseModel):
+    yes: int = 0
+    maybe: int = 0
+    no: int = 0
+    total: int = 0

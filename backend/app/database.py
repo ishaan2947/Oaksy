@@ -20,13 +20,18 @@ def _normalize_url(url: str) -> str:
 
 
 DATABASE_URL = _normalize_url(settings.database_url)
+_is_sqlite = DATABASE_URL.startswith("sqlite")
 
 # SQLite needs check_same_thread disabled for FastAPI's threaded request model.
-connect_args = (
-    {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
-)
+connect_args = {"check_same_thread": False} if _is_sqlite else {}
 
-engine = create_engine(DATABASE_URL, connect_args=connect_args, future=True)
+# Production (Postgres) pooling: pre_ping drops dead connections (Render recycles
+# them), recycle avoids stale ones, and a healthy pool absorbs concurrent load.
+engine_kwargs: dict = {"connect_args": connect_args, "future": True, "pool_pre_ping": True}
+if not _is_sqlite:
+    engine_kwargs.update(pool_size=10, max_overflow=20, pool_recycle=300)
+
+engine = create_engine(DATABASE_URL, **engine_kwargs)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
 
 

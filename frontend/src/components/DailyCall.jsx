@@ -3,7 +3,9 @@ import { api } from "../api";
 import Timer from "./Timer";
 import RevealCard from "./RevealCard";
 
-const SPORTS = ["NFL", "NBA"];
+// NFL-only for the stranger test — NBA decision moments tested as "mushy" in
+// early feedback. Re-add "NBA" here to bring the sport toggle back.
+const SPORTS = ["NFL"];
 
 export default function DailyCall({ sport, onSport, coachScore, onPicked, onToast }) {
   const [situation, setSituation] = useState(null);
@@ -75,17 +77,19 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
 
   return (
     <>
-      <div className="tabs" style={{ marginBottom: 16 }}>
-        {SPORTS.map((s) => (
-          <button
-            key={s}
-            className={`tab ${s === sport ? "active" : ""}`}
-            onClick={() => onSport(s)}
-          >
-            {s}
-          </button>
-        ))}
-      </div>
+      {SPORTS.length > 1 && (
+        <div className="tabs" style={{ marginBottom: 16 }}>
+          {SPORTS.map((s) => (
+            <button
+              key={s}
+              className={`tab ${s === sport ? "active" : ""}`}
+              onClick={() => onSport(s)}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="card">
         <div className="eyebrow">
@@ -98,6 +102,12 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
         </div>
 
         <div className="situation">{situation.situation_description}</div>
+
+        <div className="frame-note">
+          Real game, real outcome. The “right call” is set by{" "}
+          <b>win-probability models across thousands of similar situations</b> — not
+          opinion.
+        </div>
 
         {phase === "play" ? (
           <>

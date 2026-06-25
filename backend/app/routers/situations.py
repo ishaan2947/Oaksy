@@ -14,6 +14,11 @@ from ..models import Pick, Situation, User
 
 router = APIRouter(prefix="/api/situations", tags=["situations"])
 
+# The Daily Call is identical for every user all day, so cache the (answer-free)
+# payload per (sport, date). This takes the hottest read fully off the database
+# under load. Keyed by date, so it self-refreshes each morning.
+_daily_cache: dict[tuple[str, str], schemas.SituationOut] = {}
+
 
 @router.get("/daily", response_model=schemas.SituationOut)
 def daily_call(
@@ -21,10 +26,20 @@ def daily_call(
     db: Session = Depends(get_db),
 ):
     """Today's Daily Call for a sport. Answer fields are never included here."""
-    situation = services.get_or_assign_daily(db, sport, date.today())
+    today = date.today()
+    key = (sport.upper(), today.isoformat())
+    cached = _daily_cache.get(key)
+    if cached is not None:
+        return cached
+
+    situation = services.get_or_assign_daily(db, sport, today)
     if not situation:
         raise HTTPException(404, f"No situations available for {sport.upper()}")
-    return services.situation_out(situation)
+    payload = services.situation_out(situation)
+    if len(_daily_cache) > 64:  # keep the cache from growing unbounded
+        _daily_cache.clear()
+    _daily_cache[key] = payload
+    return payload
 
 
 @router.get("/{situation_id}", response_model=schemas.SituationOut)
