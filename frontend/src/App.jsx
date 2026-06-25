@@ -7,11 +7,13 @@ import DebateArena from "./components/DebateArena";
 import GMMode from "./components/GMMode";
 import CoachScore from "./components/CoachScore";
 import Leaderboard from "./components/Leaderboard";
+import LiveScores from "./components/LiveScores";
 import AuthModal from "./components/AuthModal";
 import FeedbackWidget from "./components/FeedbackWidget";
 
 const TABS = [
   { id: "daily", label: "Daily Call" },
+  { id: "scores", label: "Scores" },
   { id: "debate", label: "Debate" },
   { id: "gm", label: "GM Mode" },
   { id: "score", label: "Coach Score" },
@@ -119,6 +121,7 @@ export default function App() {
               onToast={showToast}
             />
           )}
+          {tab === "scores" && <LiveScores />}
           {tab === "debate" && (
             <DebateArena
               user={user}

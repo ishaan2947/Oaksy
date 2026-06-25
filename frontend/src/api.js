@@ -76,6 +76,9 @@ export const api = {
       },
     }),
 
+  // Live scores
+  scores: (sport) => request(`/api/scores?sport=${encodeURIComponent(sport)}`),
+
   // Coach Score + leaderboard
   myScore: () => request("/api/users/me/score", { auth: true }),
   leaderboard: () => request("/api/users/leaderboard"),

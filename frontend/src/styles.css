@@ -405,6 +405,45 @@ a { color: var(--blue-text); }
   font-size: 13.5px; font-weight: 600; color: var(--ink);
 }
 
+/* ----------------------------- Live scores ------------------------------ */
+.live-pill {
+  margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: 0.04em;
+  color: var(--red-text); text-transform: uppercase;
+}
+.scores-tie { margin: 0 0 14px; font-size: 13px; color: var(--ink-dim); line-height: 1.5; }
+.games { display: grid; gap: 10px; }
+.game {
+  padding: 12px 14px; border-radius: 12px;
+  background: var(--panel-2); border: 1px solid var(--line);
+}
+.game.live { border-color: color-mix(in srgb, var(--red) 45%, var(--line)); }
+.game-status { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.game-status .dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--red);
+  animation: pulse 1.1s infinite;
+}
+.game-status .gs { font-size: 12px; color: var(--ink-faint); font-weight: 600; }
+.game-status .gs-live {
+  font-size: 12px; color: var(--red-text); font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.game-rows { display: grid; gap: 4px; }
+.team-row { display: flex; align-items: center; gap: 10px; }
+.team-row.dim { opacity: 0.5; }
+.t-abbr {
+  font-family: var(--mono); font-weight: 800; font-size: 14px; color: var(--ink);
+  width: 46px; flex: none;
+}
+.t-name { color: var(--ink-dim); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-score {
+  margin-left: auto; font-family: var(--mono); font-weight: 800; font-size: 18px;
+  color: var(--ink); font-variant-numeric: tabular-nums; flex: none;
+}
+.game-note {
+  margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line);
+  font-size: 12.5px; color: var(--ink-dim);
+}
+
 /* ----------------------------- Split bar -------------------------------- */
 .split { margin-top: 6px; }
 .split-bar {
