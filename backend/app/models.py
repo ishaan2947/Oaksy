@@ -52,8 +52,9 @@ class Situation(Base):
     option_a: Mapped[str] = mapped_column(String)
     option_b: Mapped[str] = mapped_column(String)
     option_c: Mapped[str | None] = mapped_column(String, nullable=True)
+    option_d: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    # Option keys: "a" | "b" | "c"
+    # Option keys: "a" | "b" | "c" | "d"
     actual_call: Mapped[str] = mapped_column(String)  # what the real coach did
     best_call: Mapped[str] = mapped_column(String)    # what the data favored
 
@@ -71,7 +72,12 @@ class Situation(Base):
     )
 
     def options(self) -> dict[str, str | None]:
-        return {"a": self.option_a, "b": self.option_b, "c": self.option_c}
+        return {
+            "a": self.option_a,
+            "b": self.option_b,
+            "c": self.option_c,
+            "d": self.option_d,
+        }
 
     def option_text(self, key: str | None) -> str | None:
         if key is None:

@@ -37,5 +37,5 @@ export default function CommunitySplit({ split, options }) {
 }
 
 function swatch(key) {
-  return key === "a" ? "accent" : key === "b" ? "blue" : "gold";
+  return key === "a" ? "accent" : key === "b" ? "blue" : key === "c" ? "gold" : "purple";
 }

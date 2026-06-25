@@ -24,8 +24,8 @@ def submit_pick(
     if not situation:
         raise HTTPException(404, "Situation not found")
 
-    if payload.choice == "c" and not situation.option_c:
-        raise HTTPException(400, "This situation has no third option")
+    if not situation.option_text(payload.choice):
+        raise HTTPException(400, "That option isn't available on this situation")
 
     if user is None and not payload.anon_id:
         raise HTTPException(400, "Provide anon_id when not logged in")

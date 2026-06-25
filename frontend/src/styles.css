@@ -24,6 +24,7 @@
   --gold: #ffc23d;
   --accent: #ff5a1f; /* sideline orange — Oaksy's signature */
   --blue: #3da5ff;
+  --purple: #a779ff;
 
   --green-text: #2ee66a;
   --red-text: #ff6b6b;
@@ -56,6 +57,7 @@
   --gold: #f0a800;
   --accent: #ff5a1f;
   --blue: #2f7fe6;
+  --purple: #7c4dff;
 
   --green-text: #0a8f43;
   --red-text: #d6342b;
@@ -259,6 +261,12 @@ a { color: var(--blue-text); }
 }
 .reasoning::placeholder { color: var(--ink-faint); }
 
+.no-rush {
+  margin-bottom: 12px; padding: 9px 13px; border-radius: 10px; text-align: center;
+  font-size: 13px; font-weight: 600; color: var(--ink-dim);
+  background: var(--panel-2); border: 1px dashed var(--line);
+}
+
 /* ----------------------------- Reveal ----------------------------------- */
 .reveal { animation: risein 0.45s ease both; }
 @keyframes risein { from { opacity: 0; transform: translateY(14px); } }
@@ -282,6 +290,85 @@ a { color: var(--blue-text); }
   padding: 14px 16px; border-radius: 10px; font-size: 15.5px; line-height: 1.5;
 }
 
+/* -------------------------- Win-probability odds ------------------------ */
+.odds-head { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+.odds-head h4 { margin: 0; }
+.clarity {
+  font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line);
+}
+.clarity.strong { color: var(--green-text); border-color: color-mix(in srgb, var(--green) 50%, var(--line)); }
+.clarity.edge { color: var(--gold-text); border-color: color-mix(in srgb, var(--gold) 50%, var(--line)); }
+.clarity.coinflip { color: var(--blue-text); border-color: color-mix(in srgb, var(--blue) 50%, var(--line)); }
+.odds-sub { color: var(--ink-dim); font-size: 13.5px; line-height: 1.5; margin: 0 0 12px; }
+.odds-sub b { color: var(--ink); font-weight: 700; }
+.odds { display: grid; gap: 10px; }
+.odds-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  padding: 13px 16px; border-radius: 12px;
+}
+.odds-row.best { border-color: var(--green); background: var(--green-deep); }
+.odds-row.coach { box-shadow: inset 0 0 0 1px var(--blue); }
+.odds-row .key {
+  width: 26px; height: 26px; flex: none; display: grid; place-items: center;
+  border-radius: 7px; background: var(--bg); border: 1px solid var(--line);
+  font-family: var(--mono); font-size: 13px; color: var(--ink-dim);
+}
+.odds-row.best .key { border-color: var(--green); color: var(--green-text); }
+.odds-main { flex: 1; min-width: 0; }
+.odds-label {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 9px;
+}
+.odds-badges { display: flex; gap: 6px; margin-left: auto; }
+.odds-badges .badge {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
+  font-weight: 800; padding: 3px 7px; border-radius: 6px;
+}
+.odds-bar {
+  height: 9px; border-radius: 6px; background: var(--bg);
+  border: 1px solid var(--line); overflow: hidden;
+}
+.odds-fill {
+  height: 100%; border-radius: 6px; background: var(--ink-dim);
+  transition: width 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.odds-fill.best { background: linear-gradient(90deg, var(--green), var(--gold)); }
+.odds-pct {
+  flex: none; font-family: var(--mono); font-weight: 800; font-size: 17px;
+  font-variant-numeric: tabular-nums; color: var(--ink); min-width: 44px; text-align: right;
+}
+.odds-row.best .odds-pct { color: var(--green-text); }
+
+.grade-explainer { margin-top: 12px; }
+.grade-explainer summary {
+  cursor: pointer; font-size: 12.5px; font-weight: 700; color: var(--blue-text);
+  list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  user-select: none;
+}
+.grade-explainer summary::-webkit-details-marker { display: none; }
+.grade-explainer summary::before { content: "ⓘ"; font-size: 13px; }
+.grade-explainer[open] summary { margin-bottom: 8px; }
+.grade-explainer p {
+  margin: 0; font-size: 13px; line-height: 1.6; color: var(--ink-dim);
+  padding: 11px 13px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line);
+}
+.grade-explainer p i { color: var(--ink); font-style: italic; }
+
+.process-note {
+  margin-top: 12px; padding: 12px 14px; border-radius: 10px;
+  background: var(--panel-2); border: 1px solid var(--line); border-left: 3px solid var(--blue);
+  font-size: 13.5px; line-height: 1.55; color: var(--ink-dim);
+}
+.process-note b { color: var(--ink); font-weight: 700; }
+
+.streak-nudge {
+  margin-top: 18px; padding: 11px 14px; border-radius: 10px; text-align: center;
+  background: var(--panel-2); border: 1px dashed var(--line);
+  font-size: 13.5px; font-weight: 600; color: var(--ink);
+}
+
 /* ----------------------------- Split bar -------------------------------- */
 .split { margin-top: 6px; }
 .split-bar {
@@ -296,6 +383,7 @@ a { color: var(--blue-text); }
 .split-seg.a { background: var(--accent); }
 .split-seg.b { background: var(--blue); }
 .split-seg.c { background: var(--gold); }
+.split-seg.d { background: var(--purple); color: #fff; }
 .split-legend { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--ink-dim); }
 .split-legend span { display: flex; align-items: center; gap: 6px; }
 .swatch { width: 10px; height: 10px; border-radius: 3px; }
@@ -642,10 +730,38 @@ a.btn { text-decoration: none; display: inline-block; }
 .fb-submit { width: 100%; }
 .fb-thanks { font-weight: 700; line-height: 1.5; color: var(--ink); padding: 6px 0; }
 
-/* Scenario visual (inline SVG field/court at the top of the Daily Call card) */
+/* Scenario visual (inline SVG field/court + scoreboard at the top of the card) */
+.scenario { margin-bottom: 16px; }
 .scenario-art {
-  display: block; width: 100%; height: 104px; border-radius: 11px;
-  border: 1px solid var(--line); margin-bottom: 16px; overflow: hidden;
-  background: var(--bg);
+  display: block; width: 100%; height: 104px;
+  border-radius: 0 0 11px 11px; border: 1px solid var(--line); border-top: none;
+  overflow: hidden; background: var(--bg);
 }
 @media (max-width: 560px) { .scenario-art { height: 84px; } }
+
+.scoreboard {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 8px 14px;
+  background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 11px 11px 0 0;
+}
+.sb-team { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.sb-abbr {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.12em; color: var(--ink-faint);
+}
+.sb-pts {
+  font-family: var(--mono); font-size: 22px; font-weight: 800;
+  font-variant-numeric: tabular-nums; color: var(--ink-dim); line-height: 1;
+}
+.sb-team.lead .sb-pts { color: var(--ink); }
+.sb-team.lead .sb-abbr { color: var(--accent-text); }
+.sb-center { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 0; }
+.sb-clock {
+  font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--ink);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.sb-tag {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-contrast); background: var(--accent); padding: 2px 8px; border-radius: 999px;
+  white-space: nowrap;
+}

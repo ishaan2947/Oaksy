@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from . import schemas
 from .models import Pick, Situation
 from .players import PLAYERS
+from .seed_data import GAME_STATE, WIN_PROBS
 
 # Situations are immutable after seeding, so cache them (detached from the
 # session, safe to reuse across requests). This removes a DB read from the hot
@@ -58,10 +59,13 @@ def options_out(situation: Situation) -> list[schemas.OptionOut]:
     ]
     if situation.option_c:
         out.append(schemas.OptionOut(key="c", label=situation.option_c))
+    if situation.option_d:
+        out.append(schemas.OptionOut(key="d", label=situation.option_d))
     return out
 
 
 def situation_out(situation: Situation) -> schemas.SituationOut:
+    state = GAME_STATE.get(situation.game_id)
     return schemas.SituationOut(
         id=situation.id,
         sport=situation.sport,
@@ -70,6 +74,7 @@ def situation_out(situation: Situation) -> schemas.SituationOut:
         situation_description=situation.situation_description,
         options=options_out(situation),
         daily_date=situation.daily_date,
+        game_state=schemas.GameState(**state) if state else None,
     )
 
 
@@ -83,8 +88,13 @@ def community_split(db: Session, situation_id: str) -> schemas.CommunitySplit:
         .group_by(Pick.choice)
     ).all()
     counts = {choice: n for choice, n in rows}
-    a, b, c = counts.get("a", 0), counts.get("b", 0), counts.get("c", 0)
-    split = schemas.CommunitySplit(a=a, b=b, c=c, total=a + b + c)
+    a, b, c, d = (
+        counts.get("a", 0),
+        counts.get("b", 0),
+        counts.get("c", 0),
+        counts.get("d", 0),
+    )
+    split = schemas.CommunitySplit(a=a, b=b, c=c, d=d, total=a + b + c + d)
     _split_cache[situation_id] = (time.monotonic(), split)
     return split
 
@@ -199,6 +209,7 @@ def build_reveal(
         analytics_verdict=situation.analytics_verdict,
         ai_verdict=situation.ai_verdict or situation.analytics_verdict,
         community_split=community_split(db, situation.id),
+        win_probabilities=WIN_PROBS.get(situation.game_id),
         your_choice=your_choice,
         you_were_correct=(viewer_pick.correct if viewer_pick else None),
         you_beat_coach=(viewer_pick.beat_coach if viewer_pick else None),

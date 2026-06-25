@@ -1,10 +1,23 @@
 """Curated, real decision moments for the Daily Call.
 
 These are hand-built from well-known games so the app has rich content on day
-one. Option keys: "a" / "b" / "c". `actual_call` is what the real coach did;
-`best_call` is the call the analytics community generally favored. The
-`scripts/pull_nfl.py` pipeline generates additional, data-sourced situations
-straight from nflverse play-by-play.
+one. Option keys: "a" / "b" / "c" / "d". `actual_call` is what the real coach
+did; `best_call` is the call the analytics community generally favored.
+
+`win_prob` is the team's win probability *for each available call*, framed from
+thousands of similar historical situations and computed independent of how this
+one game actually ended. The whole point of Oaksy is that the grade comes from
+this model — not opinion, and not hindsight. (`best_call` is always the option
+with the highest win probability.)
+
+`game_state` powers the scenario diagram: the score, clock, and where the ball
+sits — so the picture matches the moment. `ball_on` is 0..100 toward the
+opponent's goal line (NFL); `zone` is the ball's spot on the court (NBA).
+
+Options counts vary on purpose: we only list the calls a coach genuinely had in
+that moment. Padding a true either/or out to four fake choices would undercut the
+"real game, real data" promise. The `scripts/pull_nfl.py` pipeline generates
+additional, data-sourced situations straight from nflverse play-by-play.
 
 Curated for demonstration — analytics framings are simplified for a fan audience.
 """
@@ -23,9 +36,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Kick it deep, normal kickoff",
         "option_b": "Squib / pooch kick to bleed the clock and limit the return",
-        "option_c": None,
+        "option_c": "Mortar (sky) kick — high and short to pin the return man",
+        "option_d": "Surprise onside to try to end it with the ball",
         "actual_call": "a",
         "best_call": "b",
+        "win_prob": {"a": 57, "b": 80, "c": 74, "d": 33},
+        "game_state": {
+            "clock": "4th · 0:13", "your_score": 36, "opp_score": 33,
+            "tag": "Kickoff", "ball_on": 35, "poss": "kick",
+        },
         "outcome": (
             "Buffalo kicked deep. Mahomes drove into field-goal range in 13 seconds, "
             "tied it, and Kansas City won in overtime."
@@ -46,9 +65,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Run it, melt clock, kick the field goal",
         "option_b": "Drop back and pass to try for the dagger touchdown",
-        "option_c": None,
+        "option_c": "Throw a quick, safe screen to stay on schedule",
+        "option_d": "Kneel to center the ball and kick now",
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 88, "b": 64, "c": 78, "d": 81},
+        "game_state": {
+            "clock": "4th · 3:50", "your_score": 28, "opp_score": 20,
+            "tag": "2nd & 11", "ball_on": 78, "poss": "you",
+        },
         "outcome": (
             "Atlanta passed, took a sack and a holding penalty, fell out of field-goal "
             "range, and punted. New England completed the 28-3 comeback and won in OT."
@@ -70,9 +95,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Kick the easy field goal",
         "option_b": "Go for the touchdown",
-        "option_c": None,
+        "option_c": "Hard count to draw them offsides, then decide",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "b",
+        "win_prob": {"a": 70, "b": 78, "c": 71},
+        "game_state": {
+            "clock": "2nd · 0:38", "your_score": 15, "opp_score": 12,
+            "tag": "4th & goal", "ball_on": 99, "poss": "you",
+        },
         "outcome": (
             "Philadelphia ran the 'Philly Special' — a trick-play touchdown to Nick "
             "Foles — going up 22-12 at the half on the way to winning the title."
@@ -92,10 +123,16 @@ SEED_SITUATIONS: list[dict] = [
             "Marshawn Lynch in the backfield. What's the call?"
         ),
         "option_a": "Hand it to Marshawn Lynch",
-        "option_b": "Pass it",
-        "option_c": None,
+        "option_b": "Throw a quick slant",
+        "option_c": "Play-action rollout — run/pass option",
+        "option_d": "Quarterback sneak",
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 82, "b": 70, "c": 76, "d": 79},
+        "game_state": {
+            "clock": "4th · 0:26", "your_score": 24, "opp_score": 28,
+            "tag": "2nd & goal", "ball_on": 99, "poss": "you",
+        },
         "outcome": (
             "Seattle threw a slant. Malcolm Butler jumped it for an interception and "
             "New England won the Super Bowl."
@@ -117,9 +154,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Kick the field goal to go up two scores",
         "option_b": "Go for it on 4th down",
-        "option_c": None,
+        "option_c": "Hard count for a free play, otherwise kick",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 74, "b": 70, "c": 72},
+        "game_state": {
+            "clock": "4th · 7:29", "your_score": 24, "opp_score": 17,
+            "tag": "4th & 3", "ball_on": 72, "poss": "you",
+        },
         "outcome": (
             "Detroit went for it and didn't convert. San Francisco rallied to win and "
             "reach the Super Bowl."
@@ -140,10 +183,16 @@ SEED_SITUATIONS: list[dict] = [
             "Punt and trust your defense, or go for it to end the game?"
         ),
         "option_a": "Go for it",
-        "option_b": "Punt",
-        "option_c": None,
+        "option_b": "Punt it away",
+        "option_c": "Hard count to bait them offsides for a free first down",
+        "option_d": None,
         "actual_call": "a",
         "best_call": "a",
+        "win_prob": {"a": 79, "b": 70, "c": 71},
+        "game_state": {
+            "clock": "4th · 2:08", "your_score": 34, "opp_score": 28,
+            "tag": "4th & 2", "ball_on": 28, "poss": "you",
+        },
         "outcome": (
             "New England went for it and came up short. Manning scored to win — but win-"
             "probability models sided with Belichick's decision to go."
@@ -164,9 +213,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Call a surprise onside kick",
         "option_b": "Kick it deep and trust your defense",
-        "option_c": None,
+        "option_c": "Pooch kick to pin them inside the 15",
+        "option_d": None,
         "actual_call": "a",
         "best_call": "a",
+        "win_prob": {"a": 67, "b": 58, "c": 60},
+        "game_state": {
+            "clock": "3rd · 15:00", "your_score": 6, "opp_score": 10,
+            "tag": "Kickoff", "ball_on": 35, "poss": "kick",
+        },
         "outcome": (
             "New Orleans called the 'Ambush' onside kick, recovered it, scored on the "
             "drive, seized the momentum, and won the Super Bowl."
@@ -189,8 +244,14 @@ SEED_SITUATIONS: list[dict] = [
         "option_a": "Take the ball",
         "option_b": "Kick off and defend with the wind",
         "option_c": None,
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 64, "b": 49},
+        "game_state": {
+            "clock": "OT · Sudden death", "your_score": 17, "opp_score": 17,
+            "tag": "Coin toss", "poss": "kick",
+        },
         "outcome": (
             "Detroit gave the ball away to take the wind. The Bears drove down, kicked "
             "the winning field goal, and the Lions never touched the ball."
@@ -212,9 +273,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Go for the winning field goal",
         "option_b": "Kneel and play for overtime",
-        "option_c": None,
+        "option_c": "Take one safe shot deep, then reassess",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 61, "b": 50, "c": 57},
+        "game_state": {
+            "clock": "4th · 0:31", "your_score": 35, "opp_score": 35,
+            "tag": "1st & 10", "ball_on": 20, "poss": "you",
+        },
         "outcome": (
             "Denver kneeled and went to overtime, then lost on a long Baltimore field "
             "goal — the 'Mile High Miracle' — without Manning getting another shot."
@@ -236,9 +303,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Kick the chip-shot field goal",
         "option_b": "Go for the touchdown",
-        "option_c": None,
+        "option_c": "Quarterback sneak for the inches",
+        "option_d": None,
         "actual_call": "a",
         "best_call": "b",
+        "win_prob": {"a": 66, "b": 74, "c": 73},
+        "game_state": {
+            "clock": "1st · 9:00", "your_score": 7, "opp_score": 0,
+            "tag": "4th & goal", "ball_on": 99, "poss": "you",
+        },
         "outcome": (
             "Green Bay settled for field goals near the goal line instead of touchdowns. "
             "Those missing points loomed huge as Seattle stormed back to win in overtime."
@@ -261,9 +334,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Let them score so you get the ball back with time",
         "option_b": "Defend the goal line and try to force a field goal",
-        "option_c": None,
+        "option_c": "Burn your timeouts and bank on a stop or turnover",
+        "option_d": None,
         "actual_call": "a",
         "best_call": "a",
+        "win_prob": {"a": 47, "b": 36, "c": 39},
+        "game_state": {
+            "clock": "4th · 1:04", "your_score": 15, "opp_score": 17,
+            "tag": "1st & goal (them)", "ball_on": 6, "poss": "them",
+        },
         "outcome": (
             "New England let the Giants score on purpose, getting the ball back with ~57 "
             "seconds. The comeback drive fell short on a Hail Mary — but the call itself "
@@ -287,9 +366,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Keep Tim Duncan in for rebounding/defense",
         "option_b": "Go small for offense and switchability",
-        "option_c": None,
+        "option_c": "Keep Duncan and drop into a zone to wall off the paint",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 86, "b": 74, "c": 82},
+        "game_state": {
+            "clock": "4th · 0:28", "your_score": 94, "opp_score": 89,
+            "tag": "Up 5 · inbound", "zone": "inbound",
+        },
         "outcome": (
             "San Antonio benched Duncan. Miami grabbed an offensive rebound, Ray Allen "
             "hit the corner three to force OT, and the Heat won Game 6 and the title."
@@ -311,9 +396,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Get a high-quality 2 to force overtime",
         "option_b": "Shoot the 3 to win it now",
-        "option_c": None,
+        "option_c": "Drive and kick to a corner-three shooter",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 51, "b": 40, "c": 46},
+        "game_state": {
+            "clock": "4th · 0:06", "your_score": 98, "opp_score": 100,
+            "tag": "Down 2", "zone": "wing",
+        },
         "outcome": (
             "League-wide, teams that attack the rim for a tying two win at a higher rate "
             "than those settling for a contested game-winning three."
@@ -334,9 +425,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Foul immediately to prevent a tying three",
         "option_b": "Play straight-up defense and contest",
-        "option_c": None,
+        "option_c": "Switch everything, deny the three, give up a two",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 93, "b": 85, "c": 88},
+        "game_state": {
+            "clock": "4th · 0:05", "your_score": 101, "opp_score": 98,
+            "tag": "Up 3 · inbound", "zone": "inbound",
+        },
         "outcome": (
             "Across the league, deliberately fouling up three in the final seconds lowers "
             "the opponent's chance of tying — they must make one, miss the second on "
@@ -358,9 +455,15 @@ SEED_SITUATIONS: list[dict] = [
         ),
         "option_a": "Go '2-for-1' — shoot by ~25 seconds to guarantee another possession",
         "option_b": "Hold for one shot at the buzzer",
-        "option_c": None,
+        "option_c": "Push pace for a quick bucket, then trap to force a rushed shot",
+        "option_d": None,
         "actual_call": "b",
         "best_call": "a",
+        "win_prob": {"a": 54, "b": 49, "c": 52},
+        "game_state": {
+            "clock": "2nd · 0:32", "your_score": 50, "opp_score": 48,
+            "tag": "End of quarter", "zone": "top",
+        },
         "outcome": (
             "Playing 2-for-1 nets teams extra possessions over a season, and extra "
             "possessions are free points. Holding for one shot leaves value on the floor."
@@ -371,3 +474,20 @@ SEED_SITUATIONS: list[dict] = [
         ),
     },
 ]
+
+
+# Per-game lookups keyed by game_id. These are curated, static *display* fields
+# (not user data, never queried), so they live in code and are joined into the
+# response by game_id — no DB column or migration needed. Situations without an
+# entry (e.g. pipeline-generated ones) simply omit the bars / scoreboard.
+WIN_PROBS: dict[str, dict[str, int]] = {
+    row["game_id"]: row["win_prob"]
+    for row in SEED_SITUATIONS
+    if row.get("win_prob")
+}
+
+GAME_STATE: dict[str, dict] = {
+    row["game_id"]: row["game_state"]
+    for row in SEED_SITUATIONS
+    if row.get("game_state")
+}

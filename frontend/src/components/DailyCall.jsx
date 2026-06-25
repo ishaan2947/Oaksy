@@ -17,6 +17,7 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
   const [reveal, setReveal] = useState(null);
   const [reasoning, setReasoning] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -24,6 +25,7 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
     setPhase("play");
     setReveal(null);
     setReasoning("");
+    setTimeUp(false);
     api
       .daily(sport)
       .then((s) => setSituation(s))
@@ -54,15 +56,12 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
     }
   }
 
-  async function expire() {
+  // The 30-second clock is a pace-setter, not a guillotine. When it runs out we
+  // don't reveal the answer or lock the user out — their call still counts.
+  // (Reddit feedback: "I can't do anything in 30 seconds.")
+  function expire() {
     if (phase === "reveal") return;
-    try {
-      const r = await api.reveal(situation.id);
-      setReveal(r);
-      setPhase("reveal");
-    } catch (e) {
-      onToast?.(e.message);
-    }
+    setTimeUp(true);
   }
 
   if (loading) return <div className="spinner">Loading today's call…</div>;
@@ -93,7 +92,7 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
       )}
 
       <div className="card">
-        <FieldDiagram sport={situation.sport} />
+        <FieldDiagram sport={situation.sport} state={situation.game_state} />
         <div className="eyebrow">
           <span className="sport">{situation.sport}</span>
           <span>The Daily Call</span>
@@ -113,6 +112,11 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
 
         {phase === "play" ? (
           <>
+            {timeUp && (
+              <div className="no-rush">
+                No rush — take the time you need. Your call still counts.
+              </div>
+            )}
             <div className="options">
               {situation.options.map((o) => (
                 <button

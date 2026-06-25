@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 
-from sqlalchemy import select
+from sqlalchemy import inspect, select, text
 from sqlalchemy.exc import IntegrityError
 
 from . import ai
@@ -17,45 +17,81 @@ from .seed_data import SEED_SITUATIONS
 
 logger = logging.getLogger("oaksy.seed")
 
+# Columns added after the first deploy. There's no Alembic in this project, so we
+# apply these forward-only "ADD COLUMN"s by hand on startup. ADD COLUMN of a
+# nullable column is instant + safe + idempotent on both SQLite and Postgres.
+_ADDED_COLUMNS: dict[str, str] = {
+    "option_d": "ALTER TABLE situations ADD COLUMN option_d VARCHAR",
+}
+
+
+def _ensure_columns() -> None:
+    insp = inspect(engine)
+    if "situations" not in insp.get_table_names():
+        return  # fresh DB — create_all already made it with every column
+    existing = {c["name"] for c in insp.get_columns("situations")}
+    for col, ddl in _ADDED_COLUMNS.items():
+        if col not in existing:
+            with engine.begin() as conn:
+                conn.execute(text(ddl))
+            logger.info("Added missing column situations.%s", col)
+
 
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
+    _ensure_columns()
+
+
+def _apply_curated(situation: Situation, row: dict) -> None:
+    """Copy curated, non-AI fields from a seed row onto a Situation."""
+    situation.sport = row["sport"]
+    situation.season = row.get("season")
+    situation.week = row.get("week")
+    situation.situation_description = row["situation_description"]
+    situation.option_a = row["option_a"]
+    situation.option_b = row["option_b"]
+    situation.option_c = row.get("option_c")
+    situation.option_d = row.get("option_d")
+    situation.actual_call = row["actual_call"]
+    situation.best_call = row["best_call"]
+    situation.outcome = row["outcome"]
+    situation.analytics_verdict = row["analytics_verdict"]
+
+
+def _verdict_for(situation: Situation, row: dict) -> str:
+    return ai.generate_verdict(
+        situation=row["situation_description"],
+        actual_call=situation.option_text(row["actual_call"]) or "",
+        best_call=situation.option_text(row["best_call"]) or "",
+        outcome=row["outcome"],
+        analytics=row["analytics_verdict"],
+    )
 
 
 def seed_situations(generate_ai: bool = True) -> int:
-    """Insert any curated situations not already present. Returns count added."""
+    """Upsert curated situations. Inserts new ones (returns count added) and
+    refreshes curated fields on existing ones so content edits reach prod. The
+    AI verdict is only generated when missing, so re-seeds cost no API calls."""
     added = 0
     with SessionLocal() as db:
         for row in SEED_SITUATIONS:
-            exists = db.scalar(
+            existing = db.scalar(
                 select(Situation).where(Situation.game_id == row["game_id"])
             )
-            if exists:
+            if existing:
+                _apply_curated(existing, row)
+                if generate_ai and not existing.ai_verdict:
+                    existing.ai_verdict = _verdict_for(existing, row)
+                try:
+                    db.commit()  # no-op UPDATE emitted only if a field changed
+                except IntegrityError:
+                    db.rollback()
                 continue
 
-            situation = Situation(
-                sport=row["sport"],
-                season=row.get("season"),
-                week=row.get("week"),
-                game_id=row["game_id"],
-                situation_description=row["situation_description"],
-                option_a=row["option_a"],
-                option_b=row["option_b"],
-                option_c=row.get("option_c"),
-                actual_call=row["actual_call"],
-                best_call=row["best_call"],
-                outcome=row["outcome"],
-                analytics_verdict=row["analytics_verdict"],
-            )
-
+            situation = Situation(game_id=row["game_id"])
+            _apply_curated(situation, row)
             if generate_ai:
-                situation.ai_verdict = ai.generate_verdict(
-                    situation=row["situation_description"],
-                    actual_call=situation.option_text(row["actual_call"]) or "",
-                    best_call=situation.option_text(row["best_call"]) or "",
-                    outcome=row["outcome"],
-                    analytics=row["analytics_verdict"],
-                )
+                situation.ai_verdict = _verdict_for(situation, row)
             db.add(situation)
             try:
                 db.commit()  # commit per row so a race (multi-worker boot) is safe

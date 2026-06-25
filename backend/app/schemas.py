@@ -38,6 +38,21 @@ class OptionOut(BaseModel):
     label: str
 
 
+class GameState(BaseModel):
+    """Visual game-state for the scenario diagram. All optional so situations
+    without curated state still render a plain field/court."""
+
+    clock: str | None = None        # e.g. "4th · 3:50", "OT", "2nd · 0:38"
+    your_score: int | None = None
+    opp_score: int | None = None
+    tag: str | None = None          # situational chip: "4th & 2", "Up 3", "Inbound"
+    ball_on: int | None = None      # 0..100 toward the opponent's goal (NFL)
+    poss: str | None = None         # "you" | "them" | "kick"
+    zone: str | None = None         # ball location label (NBA): top|wing|inbound|post
+    bases: list[int] | None = None  # [1B, 2B, 3B] occupied (MLB, v2)
+    outs: int | None = None         # MLB, v2
+
+
 class SituationOut(BaseModel):
     """The Daily Call card — never leaks the answer before the user picks."""
 
@@ -48,12 +63,14 @@ class SituationOut(BaseModel):
     situation_description: str
     options: list[OptionOut]
     daily_date: date | None
+    game_state: GameState | None = None
 
 
 class CommunitySplit(BaseModel):
     a: int = 0
     b: int = 0
     c: int = 0
+    d: int = 0
     total: int = 0
 
 
@@ -69,6 +86,9 @@ class RevealOut(BaseModel):
     analytics_verdict: str
     ai_verdict: str
     community_split: CommunitySplit
+    # Win probability per option key ("a"/"b"/"c") from the model, independent of
+    # how this one game ended. Absent for situations without curated odds.
+    win_probabilities: dict[str, int] | None = None
     your_choice: str | None = None
     you_were_correct: bool | None = None
     you_beat_coach: bool | None = None
@@ -77,7 +97,7 @@ class RevealOut(BaseModel):
 # --- Picks ------------------------------------------------------------------
 class PickRequest(BaseModel):
     situation_id: str
-    choice: str = Field(pattern="^[abc]$")
+    choice: str = Field(pattern="^[abcd]$")
     reasoning: str | None = Field(default=None, max_length=600)
     anon_id: str | None = None  # used when not logged in
 
