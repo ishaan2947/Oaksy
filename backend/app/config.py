@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     ai_model: str = "claude-sonnet-4-6"
 
+    # Google sign-in. Optional — empty => the "Continue with Google" button is
+    # hidden and the endpoint is disabled. Set to your OAuth 2.0 Web client ID.
+    google_client_id: str = ""
+
     # CORS — comma-separated origins.
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 

@@ -55,6 +55,9 @@ export const api = {
   // Auth
   signup: (payload) => request("/api/auth/signup", { method: "POST", body: payload }),
   login: (payload) => request("/api/auth/login", { method: "POST", body: payload }),
+  authConfig: () => request("/api/auth/config"),
+  google: (credential) =>
+    request("/api/auth/google", { method: "POST", body: { credential } }),
   me: () => request("/api/auth/me", { auth: true }),
 
   // Daily Call
@@ -75,6 +78,12 @@ export const api = {
   debate: () => request("/api/debate/current"),
   vote: (pickId) =>
     request(`/api/debate/posts/${pickId}/vote`, { method: "POST", auth: true }),
+  argue: (situationId, { choice, reasoning }) =>
+    request(`/api/debate/${situationId}/argue`, {
+      method: "POST",
+      auth: true,
+      body: { choice, reasoning },
+    }),
 
   // Feedback poll
   feedback: ({ rating, comment }) =>

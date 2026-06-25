@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from . import schemas
 from .models import Pick, Situation
 from .players import PLAYERS
-from .seed_data import GAME_STATE, WIN_PROBS
+from .seed_data import GAME_STATE, MATCHUPS, WIN_PROBS
 
 # Situations are immutable after seeding, so cache them (detached from the
 # session, safe to reuse across requests). This removes a DB read from the hot
@@ -201,6 +201,7 @@ def build_reveal(
     your_choice = viewer_pick.choice if viewer_pick else None
     return schemas.RevealOut(
         situation_id=situation.id,
+        matchup=MATCHUPS.get(situation.game_id),
         actual_call=situation.actual_call,
         actual_call_label=situation.option_text(situation.actual_call) or "",
         best_call=situation.best_call,

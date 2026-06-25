@@ -31,13 +31,19 @@ export function AuthProvider({ children }) {
     setUser(res.user);
   }
 
+  async function loginWithGoogle(credential) {
+    const res = await api.google(credential);
+    setToken(res.access_token);
+    setUser(res.user);
+  }
+
   function logout() {
     setToken(null);
     setUser(null);
   }
 
   return (
-    <AuthCtx.Provider value={{ user, ready, login, signup, logout }}>
+    <AuthCtx.Provider value={{ user, ready, login, signup, loginWithGoogle, logout }}>
       {children}
     </AuthCtx.Provider>
   );

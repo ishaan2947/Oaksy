@@ -18,6 +18,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class GoogleAuthRequest(BaseModel):
+    credential: str  # the ID token from Google Identity Services
+
+
+class AuthConfigOut(BaseModel):
+    google_client_id: str | None = None
+
+
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -78,6 +86,7 @@ class RevealOut(BaseModel):
     """Shown after the user picks (or when fetching results)."""
 
     situation_id: str
+    matchup: str | None = None  # real teams/year/moment — revealed only after the pick
     actual_call: str           # option key
     actual_call_label: str
     best_call: str             # option key
@@ -139,11 +148,17 @@ class DebateSituationOut(BaseModel):
     situation_id: str
     sport: str
     situation_description: str
+    matchup: str | None = None
     options: list[OptionOut]
     best_call: str
     best_call_label: str
     community_split: CommunitySplit
     posts: list[DebatePostOut]
+
+
+class ArgueRequest(BaseModel):
+    choice: str = Field(pattern="^[abcd]$")
+    reasoning: str = Field(min_length=1, max_length=600)
 
 
 class DebateArenaOut(BaseModel):

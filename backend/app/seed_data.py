@@ -4,21 +4,22 @@ These are hand-built from well-known games so the app has rich content on day
 one. Option keys: "a" / "b" / "c" / "d". `actual_call` is what the real coach
 did; `best_call` is the call the analytics community generally favored.
 
+Decision prompts are written *blind*: no team names, no star players, no event
+that gives the game away — just the situation and the archetypes that actually
+matter to the call ("an elite QB," "your gassed ace"). The real identity (teams,
+year, the famous moment) lives in `matchup` and is only revealed *after* the
+pick, so fans decide on the merits instead of recognizing the ending.
+
 `win_prob` is the team's win probability *for each available call*, framed from
 thousands of similar historical situations and computed independent of how this
-one game actually ended. The whole point of Oaksy is that the grade comes from
-this model — not opinion, and not hindsight. (`best_call` is always the option
-with the highest win probability.)
+one game actually ended. (`best_call` is always the highest-win-probability one.)
 
 `game_state` powers the scenario diagram: the score, clock, and where the ball
-sits — so the picture matches the moment. `ball_on` is 0..100 toward the
-opponent's goal line (NFL); `zone` is the ball's spot on the court (NBA).
+sits. `ball_on` is 0..100 toward the opponent's goal (NFL); `zone` is the ball's
+spot on the court (NBA); `bases`/`outs` set the diamond (MLB).
 
-Options counts vary on purpose: we only list the calls a coach genuinely had in
-that moment. Padding a true either/or out to four fake choices would undercut the
-"real game, real data" promise. The `scripts/pull_nfl.py` pipeline generates
-additional, data-sourced situations straight from nflverse play-by-play.
-
+Option counts vary on purpose — we only list the calls a coach genuinely had.
+The `scripts/pull_nfl.py` pipeline generates additional, data-sourced situations.
 Curated for demonstration — analytics framings are simplified for a fan audience.
 """
 from __future__ import annotations
@@ -30,9 +31,11 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2021,
         "week": "Divisional Round",
         "game_id": "nfl_2021_div_BUF_vs_KC",
+        "matchup": "Divisional Round · Bills vs. Chiefs · Jan 2022 (the 13 seconds)",
         "situation_description": (
-            "Divisional Round. You just took the lead with 13 seconds left. "
-            "Kicking off to Patrick Mahomes, who has all his timeouts. How do you kick it?"
+            "Playoff game. You just took the lead with 13 seconds left and you're "
+            "kicking off to an elite, quick-strike QB who still has all his timeouts. "
+            "How do you kick it?"
         ),
         "option_a": "Kick it deep, normal kickoff",
         "option_b": "Squib / pooch kick to bleed the clock and limit the return",
@@ -50,7 +53,7 @@ SEED_SITUATIONS: list[dict] = [
             "tied it, and Kansas City won in overtime."
         ),
         "analytics_verdict": (
-            "A squib kick burns clock and denies a clean return. Handing Mahomes the "
+            "A squib kick burns clock and denies a clean return. Handing an elite QB the "
             "ball at his 25 with the clock stopped on the catch was the worst-case setup."
         ),
     },
@@ -59,9 +62,11 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2016,
         "week": "Super Bowl LI",
         "game_id": "nfl_2016_sb_ATL_vs_NE",
+        "matchup": "Super Bowl LI · Falcons vs. Patriots · Feb 2017 (the 28–3 collapse)",
         "situation_description": (
-            "Super Bowl. You're up 28-20 late in the 4th, ball at the Patriots' 22 — "
-            "already in field-goal range. A field goal makes it a two-score game. What do you do?"
+            "It's the Super Bowl. You're up 28-20 late in the 4th, ball at the opponent's "
+            "22 — already in field-goal range. A field goal makes it a two-score game. "
+            "What do you do?"
         ),
         "option_a": "Run it, melt clock, kick the field goal",
         "option_b": "Drop back and pass to try for the dagger touchdown",
@@ -89,6 +94,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2017,
         "week": "Super Bowl LII",
         "game_id": "nfl_2017_sb_PHI_vs_NE",
+        "matchup": "Super Bowl LII · Eagles vs. Patriots · Feb 2018 (the 'Philly Special')",
         "situation_description": (
             "Super Bowl, final seconds of the first half. 4th-and-goal at the 1. "
             "A field goal is automatic. Do you take the points or go for the touchdown?"
@@ -118,11 +124,13 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2014,
         "week": "Super Bowl XLIX",
         "game_id": "nfl_2014_sb_SEA_vs_NE",
+        "matchup": "Super Bowl XLIX · Seahawks vs. Patriots · Feb 2015 (the goal-line INT)",
         "situation_description": (
             "Super Bowl, 26 seconds left, 2nd-and-goal at the 1, down 28-24, one timeout. "
-            "Marshawn Lynch in the backfield. What's the call?"
+            "You've got one of the best goal-line backs in football in the backfield. "
+            "What's the call?"
         ),
-        "option_a": "Hand it to Marshawn Lynch",
+        "option_a": "Hand it to your power back",
         "option_b": "Throw a quick slant",
         "option_c": "Play-action rollout — run/pass option",
         "option_d": "Quarterback sneak",
@@ -148,9 +156,10 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2023,
         "week": "NFC Championship",
         "game_id": "nfl_2023_nfcc_DET_vs_SF",
+        "matchup": "NFC Championship · Lions vs. 49ers · Jan 2024",
         "situation_description": (
-            "NFC Championship, 4th quarter, up 24-17. 4th-and-3 at the 49ers' 28, "
-            "comfortably in field-goal range with a good kicker. Do you go for it?"
+            "Conference championship, 4th quarter, up 24-17. 4th-and-3 at the opponent's "
+            "28, comfortably in field-goal range with a good kicker. Do you go for it?"
         ),
         "option_a": "Kick the field goal to go up two scores",
         "option_b": "Go for it on 4th down",
@@ -178,9 +187,11 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2009,
         "week": "Week 10",
         "game_id": "nfl_2009_wk10_NE_vs_IND",
+        "matchup": "Week 10 · Patriots vs. Colts · Nov 2009 (Belichick's 4th-and-2)",
         "situation_description": (
-            "Up 34-28, 2:08 left, 4th-and-2 at your own 28 against Peyton Manning. "
-            "Punt and trust your defense, or go for it to end the game?"
+            "Up 34-28, 2:08 left, 4th-and-2 at your own 28, with a future Hall-of-Fame QB "
+            "waiting on the other sideline. Punt and trust your defense, or go for it to "
+            "end the game?"
         ),
         "option_a": "Go for it",
         "option_b": "Punt it away",
@@ -198,7 +209,7 @@ SEED_SITUATIONS: list[dict] = [
             "probability models sided with Belichick's decision to go."
         ),
         "analytics_verdict": (
-            "Punting hands a red-hot Manning the ball and a clear path. Converting "
+            "Punting hands a red-hot Hall-of-Fame QB the ball and a clear path. Converting "
             "essentially ends it. The numbers backed going for it even though it failed."
         ),
     },
@@ -207,9 +218,10 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2009,
         "week": "Super Bowl XLIV",
         "game_id": "nfl_2009_sb_NO_vs_IND",
+        "matchup": "Super Bowl XLIV · Saints vs. Colts · Feb 2010 (the 'Ambush' onside)",
         "situation_description": (
-            "Super Bowl, opening the second half, trailing the Colts 10-6. You're "
-            "lining up to kick off to Peyton Manning. Play it straight or gamble?"
+            "Super Bowl, opening the second half, trailing 10-6. You're lining up to kick "
+            "off to a future Hall-of-Fame QB. Play it straight or gamble?"
         ),
         "option_a": "Call a surprise onside kick",
         "option_b": "Kick it deep and trust your defense",
@@ -227,7 +239,7 @@ SEED_SITUATIONS: list[dict] = [
             "drive, seized the momentum, and won the Super Bowl."
         ),
         "analytics_verdict": (
-            "Stealing a possession from Peyton Manning is worth the risk on the game's "
+            "Stealing a possession from a Hall-of-Fame QB is worth the risk on the game's "
             "biggest stage. The surprise gave the Saints an extra drive and flipped the "
             "momentum — a gutsy, high-upside call that paid off."
         ),
@@ -237,6 +249,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2002,
         "week": "Week 12",
         "game_id": "nfl_2002_DET_vs_CHI_ot",
+        "matchup": "Week 12 · Lions vs. Bears (OT) · Nov 2002",
         "situation_description": (
             "You just won the overtime coin toss. It's sudden death — first score wins. "
             "There's a stiff wind at one end. What do you do?"
@@ -267,9 +280,11 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2012,
         "week": "Divisional Round",
         "game_id": "nfl_2012_div_BAL_vs_DEN",
+        "matchup": "Divisional Round · Ravens vs. Broncos · Jan 2013 (the 'Mile High Miracle')",
         "situation_description": (
-            "Tied game, your ball at your own 20, 31 seconds left, two timeouts, and "
-            "Peyton Manning at quarterback. Push for a winning field goal, or sit on it?"
+            "Tied game, your ball at your own 20, 31 seconds left, two timeouts, and a "
+            "future Hall-of-Fame QB under center. Push for a winning field goal, or sit "
+            "on it?"
         ),
         "option_a": "Go for the winning field goal",
         "option_b": "Kneel and play for overtime",
@@ -287,7 +302,7 @@ SEED_SITUATIONS: list[dict] = [
             "goal — the 'Mile High Miracle' — without Manning getting another shot."
         ),
         "analytics_verdict": (
-            "Thirty-one seconds and two timeouts with Peyton Manning is plenty to flip "
+            "Thirty-one seconds and two timeouts with a Hall-of-Fame QB is plenty to flip "
             "into field-goal range. Playing for overtime threw away a real chance to win "
             "it in regulation."
         ),
@@ -297,9 +312,10 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2014,
         "week": "NFC Championship",
         "game_id": "nfl_2014_nfcc_SEA_vs_GB",
+        "matchup": "NFC Championship · Packers vs. Seahawks · Jan 2015",
         "situation_description": (
-            "NFC Championship, early, on the road. 4th-and-goal inches from the end "
-            "zone. Take the automatic three, or go for the touchdown?"
+            "Conference championship, early, on the road. 4th-and-goal inches from the "
+            "end zone. Take the automatic three, or go for the touchdown?"
         ),
         "option_a": "Kick the chip-shot field goal",
         "option_b": "Go for the touchdown",
@@ -327,8 +343,9 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2011,
         "week": "Super Bowl XLVI",
         "game_id": "nfl_2011_sb_NYG_vs_NE",
+        "matchup": "Super Bowl XLVI · Giants vs. Patriots · Feb 2012 (let them score)",
         "situation_description": (
-            "Super Bowl, down 2, just over a minute left. The Giants have 1st-and-goal "
+            "Super Bowl, down 2, just over a minute left. The other team has 1st-and-goal "
             "at your 6 and can run the clock down to kick the winning field goal as time "
             "expires. What's your move?"
         ),
@@ -360,13 +377,15 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2013,
         "week": "Finals Game 6",
         "game_id": "nba_2013_finals_g6_SAS_vs_MIA",
+        "matchup": "2013 NBA Finals, Game 6 · Spurs vs. Heat (Ray Allen's corner three)",
         "situation_description": (
-            "Finals, Game 6, up 5 with 28 seconds left. Free throws and a defensive "
-            "rebound can clinch the title. Do you keep your dominant rebounder on the floor?"
+            "NBA Finals, Game 6, up 5 with 28 seconds left. Free throws and a defensive "
+            "rebound can clinch the title. Do you keep your dominant rebounder — a "
+            "Hall-of-Fame big — on the floor?"
         ),
-        "option_a": "Keep Tim Duncan in for rebounding/defense",
+        "option_a": "Keep your Hall-of-Fame big in for rebounding/defense",
         "option_b": "Go small for offense and switchability",
-        "option_c": "Keep Duncan and drop into a zone to wall off the paint",
+        "option_c": "Keep him in and drop into a zone to wall off the paint",
         "option_d": None,
         "actual_call": "b",
         "best_call": "a",
@@ -390,6 +409,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2022,
         "week": "Strategy",
         "game_id": "nba_strat_down2_last_shot",
+        "matchup": None,
         "situation_description": (
             "Down 2, 6 seconds left, you have the ball and no timeouts. Drive for the tie "
             "and play for overtime, or pull up for the win?"
@@ -419,6 +439,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2018,
         "week": "Strategy",
         "game_id": "nba_strat_foul_up3",
+        "matchup": None,
         "situation_description": (
             "Up 3, opponent inbounding with 5 seconds left and no timeouts for either side. "
             "Foul before they can shoot, or play tight defense and contest the three?"
@@ -449,6 +470,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2019,
         "week": "Strategy",
         "game_id": "nba_strat_2for1",
+        "matchup": None,
         "situation_description": (
             "End of the quarter, you have the ball with about 30 seconds on the clock. "
             "Shoot early to get the ball back for a last shot, or run the clock down?"
@@ -479,13 +501,15 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2003,
         "week": "ALCS Game 7",
         "game_id": "mlb_2003_alcs_g7_BOS_vs_NYY",
+        "matchup": "2003 ALCS Game 7 · Red Sox vs. Yankees (Grady Little leaves Pedro in)",
         "situation_description": (
-            "ALCS Game 7 at Yankee Stadium. You're up 5-2 in the 8th, six outs from the "
-            "World Series — but your ace is past 115 pitches and clearly gassed, and the "
-            "Yankees are stirring. Go to your rested bullpen, or ride your guy?"
+            "League Championship Series, Game 7, on the road. You're up 5-2 in the 8th, "
+            "six outs from the World Series — but your ace is past 115 pitches and clearly "
+            "gassed, and the home crowd is stirring. Go to your rested bullpen, or ride "
+            "your guy?"
         ),
-        "option_a": "Pull Pedro and hand it to the bullpen",
-        "option_b": "Leave Pedro in — he's your ace",
+        "option_a": "Pull your ace and hand it to the bullpen",
+        "option_b": "Leave your ace in — he got you here",
         "option_c": "Let him face one more, then a quick hook",
         "option_d": None,
         "actual_call": "b",
@@ -496,11 +520,11 @@ SEED_SITUATIONS: list[dict] = [
             "tag": "Ace at 118 pitches", "bases": [1, 0, 0], "outs": 0,
         },
         "outcome": (
-            "Grady Little left Pedro in. The Yankees tied it 5-5, then won on Aaron "
-            "Boone's walk-off homer in the 11th — and Little lost his job over it."
+            "Grady Little left Pedro Martínez in. The Yankees tied it 5-5, then won on "
+            "Aaron Boone's walk-off homer in the 11th — and Little lost his job over it."
         ),
         "analytics_verdict": (
-            "Pedro's numbers fell off a cliff the third time through the order and past "
+            "The ace's numbers fell off a cliff the third time through the order and past "
             "100 pitches. With a rested pen and a three-run lead six outs from the World "
             "Series, the percentages screamed for the hook."
         ),
@@ -510,6 +534,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2024,
         "week": "Strategy",
         "game_id": "mlb_strat_sac_bunt_9th",
+        "matchup": None,
         "situation_description": (
             "Bottom of the 9th, tie game. Your leadoff man singles — runner on first, "
             "nobody out, the top of your order due up. Bunt him into scoring position, "
@@ -542,6 +567,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2024,
         "week": "Strategy",
         "game_id": "mlb_strat_ibb_setup_dp",
+        "matchup": None,
         "situation_description": (
             "One out, runner on second, first base open, and you're clinging to a lead. "
             "A dangerous slugger steps in with a light-hitting batter on deck. Pitch to "
@@ -574,6 +600,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2024,
         "week": "Strategy",
         "game_id": "mlb_strat_closer_8th",
+        "matchup": None,
         "situation_description": (
             "Tie game on the road, bottom of the 8th. The other team has the 3-4-5 "
             "hitters due and your All-Star closer is rested. Use him now, or save him "
@@ -606,6 +633,7 @@ SEED_SITUATIONS: list[dict] = [
         "season": 2024,
         "week": "Strategy",
         "game_id": "mlb_strat_infield_in_9th",
+        "matchup": None,
         "situation_description": (
             "Tie game, bottom of the 9th. The winning run is on third with one out. "
             "Bring the infield in to cut the run at the plate, or play back and try to "
@@ -636,10 +664,9 @@ SEED_SITUATIONS: list[dict] = [
 ]
 
 
-# Per-game lookups keyed by game_id. These are curated, static *display* fields
-# (not user data, never queried), so they live in code and are joined into the
-# response by game_id — no DB column or migration needed. Situations without an
-# entry (e.g. pipeline-generated ones) simply omit the bars / scoreboard.
+# Per-game lookups keyed by game_id — curated, static *display* fields joined in
+# at read time (no DB column / migration). `matchup` is shown only on the reveal,
+# so the decision prompt stays blind.
 WIN_PROBS: dict[str, dict[str, int]] = {
     row["game_id"]: row["win_prob"]
     for row in SEED_SITUATIONS
@@ -650,4 +677,10 @@ GAME_STATE: dict[str, dict] = {
     row["game_id"]: row["game_state"]
     for row in SEED_SITUATIONS
     if row.get("game_state")
+}
+
+MATCHUPS: dict[str, str] = {
+    row["game_id"]: row["matchup"]
+    for row in SEED_SITUATIONS
+    if row.get("matchup")
 }

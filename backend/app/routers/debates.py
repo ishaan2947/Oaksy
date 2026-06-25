@@ -16,6 +16,7 @@ from .. import schemas, services
 from ..database import get_db
 from ..deps import get_current_user, get_optional_user
 from ..models import DebateVote, Pick, Situation, User
+from ..seed_data import MATCHUPS
 
 router = APIRouter(prefix="/api/debate", tags=["debate"])
 
@@ -83,6 +84,7 @@ def current_arena(
                 situation_id=situation.id,
                 sport=situation.sport,
                 situation_description=situation.situation_description,
+                matchup=MATCHUPS.get(situation.game_id),
                 options=services.options_out(situation),
                 best_call=situation.best_call,
                 best_call_label=situation.option_text(situation.best_call) or "",
@@ -156,3 +158,43 @@ def vote(
         select(func.count(DebateVote.id)).where(DebateVote.pick_id == pick_id)
     ) or 0
     return {"pick_id": pick_id, "you_voted": voted, "votes": votes}
+
+
+@router.post("/{situation_id}/argue", status_code=201)
+def argue(
+    situation_id: str,
+    payload: schemas.ArgueRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Post (or update) your argument on a situation, straight from the Debate
+    Arena. If you've already made this call, we keep your pick and just attach
+    your reasoning; otherwise we record your call with it."""
+    situation = db.get(Situation, situation_id)
+    if not situation:
+        raise HTTPException(404, "Situation not found")
+    if not situation.option_text(payload.choice):
+        raise HTTPException(400, "That option isn't available on this situation")
+
+    pick = db.scalar(
+        select(Pick).where(
+            Pick.situation_id == situation_id, Pick.user_id == user.id
+        )
+    )
+    if pick:
+        # Keep their original call (it counts toward their score); add the argument.
+        pick.reasoning = payload.reasoning.strip()
+    else:
+        correct = payload.choice == situation.best_call
+        pick = Pick(
+            situation_id=situation_id,
+            user_id=user.id,
+            choice=payload.choice,
+            reasoning=payload.reasoning.strip(),
+            correct=correct,
+            beat_coach=correct and situation.actual_call != situation.best_call,
+        )
+        db.add(pick)
+    db.commit()
+    services.invalidate_split(situation_id)
+    return {"ok": True, "pick_id": pick.id}

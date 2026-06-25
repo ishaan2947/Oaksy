@@ -1,14 +1,81 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { api } from "../api";
 import { useAuth } from "../auth";
 
+// Load Google Identity Services once, on demand.
+function loadGsi() {
+  return new Promise((resolve, reject) => {
+    if (window.google?.accounts?.id) return resolve();
+    let s = document.getElementById("gsi-script");
+    if (s) {
+      s.addEventListener("load", () => resolve());
+      s.addEventListener("error", reject);
+      return;
+    }
+    s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true;
+    s.defer = true;
+    s.id = "gsi-script";
+    s.onload = () => resolve();
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
 export default function AuthModal({ onClose }) {
-  const { login, signup } = useAuth();
+  const { login, signup, loginWithGoogle } = useAuth();
   const [mode, setMode] = useState("signup");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [clientId, setClientId] = useState(null);
+  const googleBtnRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .authConfig()
+      .then((cfg) => !cancelled && setClientId(cfg.google_client_id || null))
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!clientId || !googleBtnRef.current) return;
+    let cancelled = false;
+    loadGsi()
+      .then(() => {
+        if (cancelled || !window.google?.accounts?.id) return;
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (resp) => {
+            try {
+              await loginWithGoogle(resp.credential);
+              onClose();
+            } catch (e) {
+              setErr(e.message);
+            }
+          },
+        });
+        googleBtnRef.current.innerHTML = "";
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          shape: "pill",
+          width: 300,
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submit(e) {
     e.preventDefault();
@@ -34,6 +101,17 @@ export default function AuthModal({ onClose }) {
             ? "Track your record vs real coaches and join the debate."
             : "Sign in to keep building your record."}
         </div>
+
+        {clientId && (
+          <>
+            <div className="gbtn-wrap">
+              <div ref={googleBtnRef} className="gbtn" />
+            </div>
+            <div className="or-divider">
+              <span>or use email</span>
+            </div>
+          </>
+        )}
 
         <form onSubmit={submit}>
           {mode === "signup" && (

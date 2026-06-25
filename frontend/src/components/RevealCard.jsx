@@ -48,6 +48,7 @@ export default function RevealCard({ options, reveal, coachScore, onToast }) {
 
   return (
     <div className="reveal">
+      {reveal.matchup && <div className="matchup">{reveal.matchup}</div>}
       <div className={`verdict-strip ${tone}`}>{line}</div>
 
       {hasOdds ? (

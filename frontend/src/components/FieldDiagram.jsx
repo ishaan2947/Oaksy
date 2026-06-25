@@ -52,7 +52,7 @@ function Field({ state }) {
     <svg
       className="scenario-art"
       viewBox="0 0 640 150"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Football field"
     >
@@ -115,7 +115,7 @@ function Court({ state }) {
     <svg
       className="scenario-art"
       viewBox="0 0 640 150"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Basketball half court"
     >
@@ -160,7 +160,7 @@ function Diamond({ state }) {
     <svg
       className="scenario-art"
       viewBox="0 0 640 150"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Baseball infield"
     >

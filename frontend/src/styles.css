@@ -732,12 +732,13 @@ a.btn { text-decoration: none; display: inline-block; }
 
 /* Scenario visual (inline SVG field/court + scoreboard at the top of the card) */
 .scenario { margin-bottom: 16px; }
+/* Box matches the 640x150 viewBox ratio so the SVG shows fully (meet) without
+   cropping — the football field, half-court, and diamond all fit cleanly. */
 .scenario-art {
-  display: block; width: 100%; height: 104px;
+  display: block; width: 100%; aspect-ratio: 64 / 15; height: auto;
   border-radius: 0 0 11px 11px; border: 1px solid var(--line); border-top: none;
   overflow: hidden; background: var(--bg);
 }
-@media (max-width: 560px) { .scenario-art { height: 84px; } }
 
 .scoreboard {
   display: flex; align-items: center; justify-content: space-between;
@@ -764,4 +765,64 @@ a.btn { text-decoration: none; display: inline-block; }
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--ink-contrast); background: var(--accent); padding: 2px 8px; border-radius: 999px;
   white-space: nowrap;
+}
+
+/* Intro / Begin screen (lets the user start the 30s clock on their terms) */
+.intro { text-align: center; padding: 10px 4px 6px; }
+.intro-title {
+  margin: 6px 0 10px; font-size: 26px; font-weight: 900; letter-spacing: -0.02em;
+  line-height: 1.15; color: var(--ink);
+}
+.intro-sub {
+  margin: 0 auto 20px; max-width: 460px; font-size: 15px; line-height: 1.55;
+  color: var(--ink-dim);
+}
+.intro-start { font-size: 16px; padding: 14px 26px; }
+.intro-foot { margin: 14px 0 4px; font-size: 12.5px; color: var(--ink-faint); }
+@media (max-width: 560px) { .intro-title { font-size: 22px; } }
+
+/* Matchup reveal — the "ohhh, THIS game" payoff, shown only after the pick */
+.matchup {
+  margin: 18px 0 2px; font-size: 12px; font-weight: 800; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--accent-text);
+}
+.debate-sit .matchup { margin: 8px 0 0; }
+
+/* Debate Arena — how-it-works + add-your-take */
+.block-label {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--ink-faint); margin: 0 0 4px;
+}
+.how-it-works h4 { margin: 0 0 10px; font-size: 15px; color: var(--ink); }
+.how-it-works ol {
+  margin: 0; padding-left: 20px; color: var(--ink-dim); font-size: 14px; line-height: 1.7;
+}
+.how-it-works ol b { color: var(--ink); }
+
+.argue-open { margin-top: 12px; }
+.argue {
+  margin-top: 14px; padding: 14px; border-radius: 12px;
+  background: var(--panel-2); border: 1px solid var(--line);
+}
+.argue-opts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.argue-chip {
+  padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: var(--bg); border: 1px solid var(--line); color: var(--ink-dim);
+}
+.argue-chip b { color: var(--ink-dim); margin-right: 4px; font-family: var(--mono); }
+.argue-chip.sel { border-color: var(--accent); color: var(--ink); }
+.argue-chip.sel b { color: var(--accent-text); }
+.argue .reasoning { margin-top: 0; }
+.argue-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+.argue-note { margin: 8px 0 0; font-size: 12px; color: var(--ink-faint); }
+
+/* Google sign-in button + divider */
+.gbtn-wrap { display: flex; justify-content: center; margin: 4px 0 6px; }
+.gbtn { color-scheme: light; min-height: 40px; }
+.or-divider {
+  display: flex; align-items: center; gap: 12px; margin: 12px 0 4px;
+  color: var(--ink-faint); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.or-divider::before, .or-divider::after {
+  content: ""; flex: 1; height: 1px; background: var(--line);
 }

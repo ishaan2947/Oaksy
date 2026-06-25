@@ -10,12 +10,20 @@ import FieldDiagram from "./FieldDiagram";
 // infield in, closer usage), per the Reddit feedback.
 const SPORTS = ["NFL", "NBA", "MLB"];
 
+const SPORT_TEASER = {
+  NFL: "A real coaching decision from an NFL game.",
+  NBA: "A real end-game decision from an NBA game.",
+  MLB: "A real managerial decision from an MLB game.",
+};
+
 export default function DailyCall({ sport, onSport, coachScore, onPicked, onToast }) {
   const [situation, setSituation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [phase, setPhase] = useState("play"); // play | reveal
+  // intro → play → reveal. Intro lets the user start the 30s clock on their
+  // terms instead of being dropped straight into a countdown.
+  const [phase, setPhase] = useState("intro");
   const [reveal, setReveal] = useState(null);
   const [reasoning, setReasoning] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +32,7 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
   const load = useCallback(() => {
     setLoading(true);
     setError(null);
-    setPhase("play");
+    setPhase("intro");
     setReveal(null);
     setReasoning("");
     setTimeUp(false);
@@ -38,6 +46,11 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
   useEffect(() => {
     load();
   }, [load]);
+
+  function begin() {
+    setTimeUp(false);
+    setPhase("play");
+  }
 
   async function pick(choice) {
     if (submitting || phase === "reveal") return;
@@ -98,55 +111,70 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
         <div className="eyebrow">
           <span className="sport">{situation.sport}</span>
           <span>The Daily Call</span>
-          {situation.week ? <span>· {situation.week}</span> : null}
-          {phase === "play" && (
-            <Timer seconds={30} running onExpire={expire} />
-          )}
+          {phase === "play" && <Timer seconds={30} running onExpire={expire} />}
         </div>
 
-        <div className="situation">{situation.situation_description}</div>
-
-        <div className="frame-note">
-          Real game, real outcome. The “right call” is set by{" "}
-          <b>win-probability models across thousands of similar situations</b> — not
-          opinion.
-        </div>
-
-        {phase === "play" ? (
-          <>
-            {timeUp && (
-              <div className="no-rush">
-                No rush — take the time you need. Your call still counts.
-              </div>
-            )}
-            <div className="options">
-              {situation.options.map((o) => (
-                <button
-                  key={o.key}
-                  className="option"
-                  disabled={submitting}
-                  onClick={() => pick(o.key)}
-                >
-                  <span className="key">{o.key.toUpperCase()}</span>
-                  <span>{o.label}</span>
-                </button>
-              ))}
-            </div>
-            <textarea
-              className="reasoning"
-              placeholder="Make your case (optional) — strong arguments win the Debate Arena."
-              value={reasoning}
-              maxLength={600}
-              onChange={(e) => setReasoning(e.target.value)}
-            />
-          </>
+        {phase === "intro" ? (
+          <div className="intro">
+            <h2 className="intro-title">Make the call before the coach did.</h2>
+            <p className="intro-sub">
+              {SPORT_TEASER[situation.sport] || "A real coaching decision."} You'll
+              get the situation and 30 seconds on the clock — then see the real call,
+              what the data said, and how the crowd voted.
+            </p>
+            <button className="btn primary intro-start" onClick={begin}>
+              Start today's call →
+            </button>
+            <p className="intro-foot">No account needed. ~30 seconds.</p>
+          </div>
         ) : (
-          <RevealCard
-            options={situation.options}
-            reveal={reveal}
-            coachScore={coachScore}
-            onToast={onToast}
-          />
+          <>
+            <div className="situation">{situation.situation_description}</div>
+
+            <div className="frame-note">
+              Real game, real outcome. The “right call” is set by{" "}
+              <b>win-probability models across thousands of similar situations</b> —
+              not opinion. We hide the teams until after you pick, so you decide on
+              the merits.
+            </div>
+
+            {phase === "play" ? (
+              <>
+                {timeUp && (
+                  <div className="no-rush">
+                    No rush — take the time you need. Your call still counts.
+                  </div>
+                )}
+                <div className="options">
+                  {situation.options.map((o) => (
+                    <button
+                      key={o.key}
+                      className="option"
+                      disabled={submitting}
+                      onClick={() => pick(o.key)}
+                    >
+                      <span className="key">{o.key.toUpperCase()}</span>
+                      <span>{o.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <textarea
+                  className="reasoning"
+                  placeholder="Make your case (optional) — strong arguments win the Debate Arena."
+                  value={reasoning}
+                  maxLength={600}
+                  onChange={(e) => setReasoning(e.target.value)}
+                />
+              </>
+            ) : (
+              <RevealCard
+                options={situation.options}
+                reveal={reveal}
+                coachScore={coachScore}
+                onToast={onToast}
+              />
+            )}
+          </>
         )}
       </div>
 
