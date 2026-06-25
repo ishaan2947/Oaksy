@@ -50,7 +50,7 @@ async def daily_call(sport: str = Query(default="NFL")):
 
 @router.get("/{situation_id}", response_model=schemas.SituationOut)
 def get_situation(situation_id: str, db: Session = Depends(get_db)):
-    situation = db.get(Situation, situation_id)
+    situation = services.get_situation_cached(db, situation_id)
     if not situation:
         raise HTTPException(404, "Situation not found")
     return services.situation_out(situation)
@@ -64,7 +64,7 @@ def reveal(
     user: User | None = Depends(get_optional_user),
 ):
     """The full verdict + community split. Includes the viewer's result if they picked."""
-    situation = db.get(Situation, situation_id)
+    situation = services.get_situation_cached(db, situation_id)
     if not situation:
         raise HTTPException(404, "Situation not found")
 

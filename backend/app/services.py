@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+import time
 from datetime import date
 
 from sqlalchemy import func, select
@@ -10,6 +11,35 @@ from sqlalchemy.orm import Session
 from . import schemas
 from .models import Pick, Situation
 from .players import PLAYERS
+
+# Situations are immutable after seeding, so cache them (detached from the
+# session, safe to reuse across requests). This removes a DB read from the hot
+# pick/reveal paths.
+_situation_cache: dict[str, Situation] = {}
+
+# The community split changes constantly under load; a tiny TTL collapses many
+# concurrent GROUP BY queries into one. Invalidated immediately when a pick lands
+# so the submitter always sees their own vote counted.
+_split_cache: dict[str, tuple[float, "schemas.CommunitySplit"]] = {}
+_SPLIT_TTL = 3.0
+
+
+def get_situation_cached(db: Session, situation_id: str) -> Situation | None:
+    cached = _situation_cache.get(situation_id)
+    if cached is not None:
+        return cached
+    situation = db.get(Situation, situation_id)
+    if situation is None:
+        return None
+    db.expunge(situation)  # detach: immutable, reused read-only across requests
+    if len(_situation_cache) > 256:
+        _situation_cache.clear()
+    _situation_cache[situation_id] = situation
+    return situation
+
+
+def invalidate_split(situation_id: str) -> None:
+    _split_cache.pop(situation_id, None)
 
 # --- 82-0 GM Mode tuning ----------------------------------------------------
 GM_CAP = 32
@@ -44,6 +74,9 @@ def situation_out(situation: Situation) -> schemas.SituationOut:
 
 
 def community_split(db: Session, situation_id: str) -> schemas.CommunitySplit:
+    hit = _split_cache.get(situation_id)
+    if hit is not None and (time.monotonic() - hit[0]) < _SPLIT_TTL:
+        return hit[1]
     rows = db.execute(
         select(Pick.choice, func.count(Pick.id))
         .where(Pick.situation_id == situation_id)
@@ -51,7 +84,9 @@ def community_split(db: Session, situation_id: str) -> schemas.CommunitySplit:
     ).all()
     counts = {choice: n for choice, n in rows}
     a, b, c = counts.get("a", 0), counts.get("b", 0), counts.get("c", 0)
-    return schemas.CommunitySplit(a=a, b=b, c=c, total=a + b + c)
+    split = schemas.CommunitySplit(a=a, b=b, c=c, total=a + b + c)
+    _split_cache[situation_id] = (time.monotonic(), split)
+    return split
 
 
 def get_or_assign_daily(db: Session, sport: str, day: date) -> Situation | None:
