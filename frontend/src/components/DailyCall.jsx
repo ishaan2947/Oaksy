@@ -4,9 +4,11 @@ import Timer from "./Timer";
 import RevealCard from "./RevealCard";
 import FieldDiagram from "./FieldDiagram";
 
-// NFL-only for the stranger test — NBA decision moments tested as "mushy" in
-// early feedback. Re-add "NBA" here to bring the sport toggle back.
-const SPORTS = ["NFL"];
+// All three sports. We keep NBA to genuinely clean, binary coaching calls (foul
+// up 3, pull the rebounder, 2-for-1) — the kind anyone can judge — not play
+// design or rotations. MLB has the cleanest decision points of all (bunt, IBB,
+// infield in, closer usage), per the Reddit feedback.
+const SPORTS = ["NFL", "NBA", "MLB"];
 
 export default function DailyCall({ sport, onSport, coachScore, onPicked, onToast }) {
   const [situation, setSituation] = useState(null);

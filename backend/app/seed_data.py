@@ -473,6 +473,166 @@ SEED_SITUATIONS: list[dict] = [
             "to guarantee the last possession is a small edge that compounds all game."
         ),
     },
+    # ---------------------------- MLB ----------------------------
+    {
+        "sport": "MLB",
+        "season": 2003,
+        "week": "ALCS Game 7",
+        "game_id": "mlb_2003_alcs_g7_BOS_vs_NYY",
+        "situation_description": (
+            "ALCS Game 7 at Yankee Stadium. You're up 5-2 in the 8th, six outs from the "
+            "World Series — but your ace is past 115 pitches and clearly gassed, and the "
+            "Yankees are stirring. Go to your rested bullpen, or ride your guy?"
+        ),
+        "option_a": "Pull Pedro and hand it to the bullpen",
+        "option_b": "Leave Pedro in — he's your ace",
+        "option_c": "Let him face one more, then a quick hook",
+        "option_d": None,
+        "actual_call": "b",
+        "best_call": "a",
+        "win_prob": {"a": 82, "b": 66, "c": 72},
+        "game_state": {
+            "clock": "Bot 8th", "your_score": 5, "opp_score": 2,
+            "tag": "Ace at 118 pitches", "bases": [1, 0, 0], "outs": 0,
+        },
+        "outcome": (
+            "Grady Little left Pedro in. The Yankees tied it 5-5, then won on Aaron "
+            "Boone's walk-off homer in the 11th — and Little lost his job over it."
+        ),
+        "analytics_verdict": (
+            "Pedro's numbers fell off a cliff the third time through the order and past "
+            "100 pitches. With a rested pen and a three-run lead six outs from the World "
+            "Series, the percentages screamed for the hook."
+        ),
+    },
+    {
+        "sport": "MLB",
+        "season": 2024,
+        "week": "Strategy",
+        "game_id": "mlb_strat_sac_bunt_9th",
+        "situation_description": (
+            "Bottom of the 9th, tie game. Your leadoff man singles — runner on first, "
+            "nobody out, the top of your order due up. Bunt him into scoring position, "
+            "or swing away?"
+        ),
+        "option_a": "Sacrifice bunt him to second",
+        "option_b": "Swing away and play for the big inning",
+        "option_c": "Put a steal on instead of giving up an out",
+        "option_d": None,
+        "actual_call": "a",
+        "best_call": "b",
+        "win_prob": {"a": 71, "b": 76, "c": 73},
+        "game_state": {
+            "clock": "Bot 9th", "your_score": 3, "opp_score": 3,
+            "tag": "Runner on 1st · 0 out", "bases": [1, 0, 0], "outs": 0,
+        },
+        "outcome": (
+            "League-wide, giving away an out with a sacrifice bunt lowers run expectancy "
+            "in this spot — teams that swing away walk it off more often than teams that "
+            "bunt the runner over."
+        ),
+        "analytics_verdict": (
+            "Outs are the most precious thing you have. Trading one for 90 feet shrinks "
+            "your run expectancy; with the top of the order up, swinging away keeps the "
+            "walk-off — and the big inning — alive."
+        ),
+    },
+    {
+        "sport": "MLB",
+        "season": 2024,
+        "week": "Strategy",
+        "game_id": "mlb_strat_ibb_setup_dp",
+        "situation_description": (
+            "One out, runner on second, first base open, and you're clinging to a lead. "
+            "A dangerous slugger steps in with a light-hitting batter on deck. Pitch to "
+            "him, or put him on?"
+        ),
+        "option_a": "Pitch to the slugger",
+        "option_b": "Walk him to set up the force and face the weak bat",
+        "option_c": None,
+        "option_d": None,
+        "actual_call": "a",
+        "best_call": "b",
+        "win_prob": {"a": 68, "b": 73},
+        "game_state": {
+            "clock": "Top 8th", "your_score": 3, "opp_score": 2,
+            "tag": "1 out · runner on 2nd", "bases": [0, 1, 0], "outs": 1,
+        },
+        "outcome": (
+            "With first base open and a steep drop-off to the on-deck hitter, putting the "
+            "slugger on sets up a force at every base and a tailor-made inning-ending "
+            "double play."
+        ),
+        "analytics_verdict": (
+            "Walking a great hitter to face a poor one — and turning a single into a "
+            "possible double play — is the rare free-baserunner move the math actually "
+            "likes, when the on-deck gap is this wide."
+        ),
+    },
+    {
+        "sport": "MLB",
+        "season": 2024,
+        "week": "Strategy",
+        "game_id": "mlb_strat_closer_8th",
+        "situation_description": (
+            "Tie game on the road, bottom of the 8th. The other team has the 3-4-5 "
+            "hitters due and your All-Star closer is rested. Use him now, or save him "
+            "for a 'save situation' in the 9th?"
+        ),
+        "option_a": "Bring the closer in now for the heart of the order",
+        "option_b": "Hold him for the 9th and a save chance",
+        "option_c": "Use a setup man now, closer on standby",
+        "option_d": None,
+        "actual_call": "b",
+        "best_call": "a",
+        "win_prob": {"a": 57, "b": 50, "c": 53},
+        "game_state": {
+            "clock": "Bot 8th", "your_score": 4, "opp_score": 4,
+            "tag": "Heart of the order up", "bases": [0, 0, 0], "outs": 0,
+        },
+        "outcome": (
+            "Across the league, using your best reliever in the highest-leverage moment "
+            "— not just the 9th — wins more games. Saving him for a lead you might never "
+            "get leaves your best arm in the bullpen."
+        ),
+        "analytics_verdict": (
+            "The save rule is a stat, not a strategy. A tie against the 3-4-5 hitters is "
+            "the highest-leverage moment in the game — that's exactly when your best arm "
+            "belongs on the mound."
+        ),
+    },
+    {
+        "sport": "MLB",
+        "season": 2024,
+        "week": "Strategy",
+        "game_id": "mlb_strat_infield_in_9th",
+        "situation_description": (
+            "Tie game, bottom of the 9th. The winning run is on third with one out. "
+            "Bring the infield in to cut the run at the plate, or play back and try to "
+            "turn two?"
+        ),
+        "option_a": "Bring the infield in to stop the run",
+        "option_b": "Play back and go for the double play",
+        "option_c": None,
+        "option_d": None,
+        "actual_call": "b",
+        "best_call": "a",
+        "win_prob": {"a": 64, "b": 40},
+        "game_state": {
+            "clock": "Bot 9th", "your_score": 2, "opp_score": 2,
+            "tag": "Winning run on 3rd · 1 out", "bases": [0, 0, 1], "outs": 1,
+        },
+        "outcome": (
+            "With the winning run 90 feet away and one out, a normal grounder to a deep "
+            "infield ends the game. Playing back hands the other team a walk-off on "
+            "almost any ground ball."
+        ),
+        "analytics_verdict": (
+            "The double play doesn't help when the run scores anyway — that's a walk-off "
+            "loss. Infield in is the forced move: cut the run at the plate and live to "
+            "the 10th."
+        ),
+    },
 ]
 
 
