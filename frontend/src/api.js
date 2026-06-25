@@ -64,10 +64,16 @@ export const api = {
   daily: (sport) => request(`/api/situations/daily?sport=${encodeURIComponent(sport)}`),
   reveal: (id) =>
     request(`/api/situations/${id}/reveal?anon_id=${encodeURIComponent(anonId())}`),
-  submitPick: ({ situation_id, choice, reasoning }) =>
+  submitPick: ({ situation_id, choice, reasoning, confidence }) =>
     request("/api/picks", {
       method: "POST",
-      body: { situation_id, choice, reasoning, anon_id: getToken() ? null : anonId() },
+      body: {
+        situation_id,
+        choice,
+        reasoning,
+        confidence,
+        anon_id: getToken() ? null : anonId(),
+      },
     }),
 
   // Coach Score + leaderboard

@@ -39,6 +39,7 @@ def submit_pick(
         anon_id=None if user else payload.anon_id,
         choice=payload.choice,
         reasoning=(payload.reasoning or "").strip() or None,
+        confidence=payload.confidence,
         correct=correct,
         beat_coach=beat_coach,
     )

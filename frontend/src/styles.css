@@ -267,6 +267,31 @@ a { color: var(--blue-text); }
   background: var(--panel-2); border: 1px dashed var(--line);
 }
 
+/* Confidence selector (drives the Sharp Score) */
+.conf {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.conf-label { font-size: 13px; font-weight: 600; color: var(--ink-dim); }
+.conf-chips { display: flex; gap: 8px; }
+.conf-chip {
+  padding: 7px 13px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: var(--panel-2); border: 1px solid var(--line); color: var(--ink-dim);
+}
+.conf-chip b { color: var(--ink-faint); font-family: var(--mono); font-size: 11px; margin-left: 3px; }
+.conf-chip.sel { border-color: var(--accent); color: var(--ink); background: var(--bg); }
+.conf-chip.sel b { color: var(--accent-text); }
+
+/* Immediate Sharp Score feedback on the reveal */
+.sharp-delta {
+  display: flex; align-items: center; gap: 10px; margin: 6px 0 2px;
+  font-size: 13.5px; color: var(--ink-dim);
+}
+.sharp-delta b {
+  font-family: var(--mono); font-size: 15px; padding: 2px 9px; border-radius: 7px;
+}
+.sharp-delta.good b { color: var(--green-text); background: var(--green-deep); }
+.sharp-delta.bad b { color: var(--red-text); background: var(--red-deep); }
+
 /* ----------------------------- Reveal ----------------------------------- */
 .reveal { animation: risein 0.45s ease both; }
 @keyframes risein { from { opacity: 0; transform: translateY(14px); } }
@@ -362,6 +387,17 @@ a { color: var(--blue-text); }
   font-size: 13.5px; line-height: 1.55; color: var(--ink-dim);
 }
 .process-note b { color: var(--ink); font-weight: 700; }
+
+.stacked {
+  display: flex; align-items: center; gap: 12px; margin-top: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  background: var(--panel-2); border: 1px solid var(--line);
+}
+.stacked-pct {
+  font-family: var(--mono); font-size: 24px; font-weight: 800; line-height: 1;
+  color: var(--accent-text); font-variant-numeric: tabular-nums; flex: none;
+}
+.stacked-txt { font-size: 13.5px; line-height: 1.45; color: var(--ink-dim); }
 
 .streak-nudge {
   margin-top: 18px; padding: 11px 14px; border-radius: 10px; text-align: center;

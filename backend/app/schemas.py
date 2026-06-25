@@ -108,6 +108,7 @@ class PickRequest(BaseModel):
     situation_id: str
     choice: str = Field(pattern="^[abcd]$")
     reasoning: str | None = Field(default=None, max_length=600)
+    confidence: int | None = Field(default=None, ge=1, le=3)  # 1 lean, 2 confident, 3 lock
     anon_id: str | None = None  # used when not logged in
 
 
@@ -122,6 +123,8 @@ class CoachScore(BaseModel):
     rank_label: str
     current_streak: int = 0    # consecutive days with a Daily Call
     longest_streak: int = 0
+    sharp_score: float = 50.0  # 0-100 calibration: confident+right up, confident+wrong down
+    sharp_label: str = "Unrated"
     gm_teams: int = 0
     gm_rating: float = 0.0     # 0-100 average Claude team score
     gm_rank_label: str = "Unrated"

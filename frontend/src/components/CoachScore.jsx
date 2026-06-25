@@ -58,6 +58,12 @@ export default function CoachScore({ user, score, onLogin }) {
             <div className="l">Times you beat the coach</div>
           </div>
           <div className="score-tile">
+            <div className="n" style={{ color: "var(--blue-text)" }}>
+              {score.sharp_label === "Unrated" ? "—" : score.sharp_score}
+            </div>
+            <div className="l">Sharp Score · {score.sharp_label}</div>
+          </div>
+          <div className="score-tile">
             <div className="n">{score.total_calls}</div>
             <div className="l">Calls made</div>
           </div>

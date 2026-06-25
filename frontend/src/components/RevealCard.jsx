@@ -5,7 +5,7 @@ import ShareCard from "./ShareCard";
 // Order is deliberate: lead with the *data* (win probability per call), say how
 // clear-cut it was, then show what actually happened — kept separate, with a
 // "process, not result" note — so the grade never reads as hindsight or opinion.
-export default function RevealCard({ options, reveal, coachScore, onToast }) {
+export default function RevealCard({ options, reveal, coachScore, confidence, onToast }) {
   const odds = reveal.win_probabilities;
   const hasOdds = odds && options.every((o) => typeof odds[o.key] === "number");
 
@@ -46,10 +46,36 @@ export default function RevealCard({ options, reveal, coachScore, onToast }) {
 
   const streak = coachScore?.current_streak;
 
+  // "How you stacked up" — share of the crowd that found the data's call.
+  // Pure social proof from the community split; shown once enough have played.
+  const split = reveal.community_split || {};
+  const total = split.total || 0;
+  const rightPct =
+    total > 0 ? Math.round(((split[reveal.best_call] || 0) / total) * 100) : null;
+  const showStacked = total >= 4 && rightPct != null && reveal.your_choice;
+
+  // Immediate Sharp Score feedback for the call you just locked in.
+  let sharp = null;
+  if (confidence && reveal.your_choice && typeof reveal.you_were_correct === "boolean") {
+    const pts = reveal.you_were_correct ? confidence : -confidence;
+    const word = { 1: "leaned", 2: "were confident", 3: "locked it in" }[confidence];
+    sharp = {
+      pts,
+      good: pts > 0,
+      text: `You ${word} and ${reveal.you_were_correct ? "nailed it" : "missed"}.`,
+    };
+  }
+
   return (
     <div className="reveal">
       {reveal.matchup && <div className="matchup">{reveal.matchup}</div>}
       <div className={`verdict-strip ${tone}`}>{line}</div>
+      {sharp && (
+        <div className={`sharp-delta ${sharp.good ? "good" : "bad"}`}>
+          <b>{sharp.pts > 0 ? `+${sharp.pts}` : sharp.pts} Sharp</b>
+          <span>{sharp.text}</span>
+        </div>
+      )}
 
       {hasOdds ? (
         <div className="block">
@@ -148,6 +174,17 @@ export default function RevealCard({ options, reveal, coachScore, onToast }) {
       <div className="block">
         <h4>The community split</h4>
         <CommunitySplit split={reveal.community_split} options={options} />
+        {showStacked && (
+          <div className="stacked">
+            <span className="stacked-pct">{rightPct}%</span>
+            <span className="stacked-txt">
+              of coaches found the data's call.{" "}
+              {reveal.you_were_correct
+                ? "You're one of them."
+                : "You missed it — you're in good company."}
+            </span>
+          </div>
+        )}
       </div>
 
       {streak > 0 && (

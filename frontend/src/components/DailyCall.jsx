@@ -26,6 +26,8 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
   const [phase, setPhase] = useState("intro");
   const [reveal, setReveal] = useState(null);
   const [reasoning, setReasoning] = useState("");
+  const [confidence, setConfidence] = useState(2); // 1 lean · 2 confident · 3 lock it
+  const [pickedConfidence, setPickedConfidence] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
 
@@ -35,6 +37,8 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
     setPhase("intro");
     setReveal(null);
     setReasoning("");
+    setConfidence(2);
+    setPickedConfidence(null);
     setTimeUp(false);
     api
       .daily(sport)
@@ -60,8 +64,10 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
         situation_id: situation.id,
         choice,
         reasoning: reasoning.trim() || null,
+        confidence,
       });
       setReveal(r);
+      setPickedConfidence(confidence);
       setPhase("reveal");
       onPicked?.();
     } catch (e) {
@@ -145,6 +151,26 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
                     No rush — take the time you need. Your call still counts.
                   </div>
                 )}
+                <div className="conf">
+                  <span className="conf-label">How sure are you?</span>
+                  <div className="conf-chips">
+                    {[
+                      [1, "Lean", "×1"],
+                      [2, "Confident", "×2"],
+                      [3, "Lock it", "×3"],
+                    ].map(([v, label, mult]) => (
+                      <button
+                        key={v}
+                        type="button"
+                        className={`conf-chip ${confidence === v ? "sel" : ""}`}
+                        onClick={() => setConfidence(v)}
+                        disabled={submitting}
+                      >
+                        {label} <b>{mult}</b>
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="options">
                   {situation.options.map((o) => (
                     <button
@@ -171,6 +197,7 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
                 options={situation.options}
                 reveal={reveal}
                 coachScore={coachScore}
+                confidence={pickedConfidence}
                 onToast={onToast}
               />
             )}

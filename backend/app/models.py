@@ -115,8 +115,11 @@ class Pick(Base):
     )
     anon_id: Mapped[str | None] = mapped_column(String, index=True, nullable=True)
 
-    choice: Mapped[str] = mapped_column(String)  # "a" | "b" | "c"
+    choice: Mapped[str] = mapped_column(String)  # "a" | "b" | "c" | "d"
     reasoning: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # How sure the user was: 1 (lean) / 2 (confident) / 3 (lock it). Drives the
+    # Sharp Score — rewards being confident and right, punishes confident + wrong.
+    confidence: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     # Computed at submit time against the situation.
     correct: Mapped[bool] = mapped_column(Boolean, default=False)      # picked the data-optimal call

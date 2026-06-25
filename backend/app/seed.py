@@ -20,21 +20,24 @@ logger = logging.getLogger("oaksy.seed")
 # Columns added after the first deploy. There's no Alembic in this project, so we
 # apply these forward-only "ADD COLUMN"s by hand on startup. ADD COLUMN of a
 # nullable column is instant + safe + idempotent on both SQLite and Postgres.
-_ADDED_COLUMNS: dict[str, str] = {
-    "option_d": "ALTER TABLE situations ADD COLUMN option_d VARCHAR",
+_ADDED_COLUMNS: dict[str, list[tuple[str, str]]] = {
+    "situations": [("option_d", "ALTER TABLE situations ADD COLUMN option_d VARCHAR")],
+    "picks": [("confidence", "ALTER TABLE picks ADD COLUMN confidence INTEGER")],
 }
 
 
 def _ensure_columns() -> None:
     insp = inspect(engine)
-    if "situations" not in insp.get_table_names():
-        return  # fresh DB — create_all already made it with every column
-    existing = {c["name"] for c in insp.get_columns("situations")}
-    for col, ddl in _ADDED_COLUMNS.items():
-        if col not in existing:
-            with engine.begin() as conn:
-                conn.execute(text(ddl))
-            logger.info("Added missing column situations.%s", col)
+    tables = set(insp.get_table_names())
+    for table, cols in _ADDED_COLUMNS.items():
+        if table not in tables:
+            continue  # fresh DB — create_all already made it with every column
+        existing = {c["name"] for c in insp.get_columns(table)}
+        for col, ddl in cols:
+            if col not in existing:
+                with engine.begin() as conn:
+                    conn.execute(text(ddl))
+                logger.info("Added missing column %s.%s", table, col)
 
 
 def create_tables() -> None:

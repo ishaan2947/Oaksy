@@ -52,6 +52,37 @@ def _streaks(pick_dates: list[date]) -> tuple[int, int]:
     return current, longest
 
 
+def _sharp_label(score: float, graded: int) -> str:
+    if graded < 3:
+        return "Unrated"
+    if score >= 72:
+        return "Sharp"
+    if score >= 56:
+        return "Calibrated"
+    if score >= 44:
+        return "Even"
+    if score >= 30:
+        return "Loose"
+    return "Overconfident"
+
+
+def _sharp_score(db: Session, user: User) -> tuple[float, str]:
+    """Calibration score from confidence-weighted picks. Confident + right pushes
+    it up; confident + wrong pulls it down. 50 = neutral, no info."""
+    rows = db.execute(
+        select(Pick.confidence, Pick.correct).where(
+            Pick.user_id == user.id, Pick.confidence.is_not(None)
+        )
+    ).all()
+    if not rows:
+        return 50.0, "Unrated"
+    # Each graded pick scores in [-3, +3]; average mapped onto 0-100.
+    pts = sum((c if correct else -c) for c, correct in rows)
+    avg = pts / len(rows)
+    score = round((avg + 3) / 6 * 100, 1)
+    return score, _sharp_label(score, len(rows))
+
+
 def _gm_rank_label(rating: float, teams: int) -> str:
     if teams == 0:
         return "Unrated"
@@ -109,6 +140,8 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
     ).all()
     current_streak, longest_streak = _streaks([dt.date() for dt in pick_dts if dt])
 
+    sharp_score, sharp_label = _sharp_score(db, user)
+
     win_rate = round((correct / total) * 100, 1) if total else 0.0
     return schemas.CoachScore(
         display_name=user.display_name,
@@ -120,6 +153,8 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
         rank_label=_rank_label(win_rate, total),
         current_streak=current_streak,
         longest_streak=longest_streak,
+        sharp_score=sharp_score,
+        sharp_label=sharp_label,
         gm_teams=gm_teams,
         gm_rating=gm_rating,
         gm_rank_label=_gm_rank_label(gm_rating, gm_teams),
