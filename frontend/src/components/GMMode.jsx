@@ -104,7 +104,7 @@ export default function GMMode({ onSubmitted, onToast }) {
             />
           </div>
           <div className="cap-label">
-            Cap: <b style={{ color: overCap ? "var(--red)" : undefined }}>{cost}</b> / {cap} ·{" "}
+            Cap: <b style={{ color: overCap ? "var(--red-text)" : undefined }}>{cost}</b> / {cap} ·{" "}
             {selected.length}/{spin.roster_size} starters
           </div>
         </div>

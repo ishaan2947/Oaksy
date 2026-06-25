@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "./api";
 import { useAuth } from "./auth";
+import { getTheme, toggleTheme } from "./theme";
 import DailyCall from "./components/DailyCall";
 import DebateArena from "./components/DebateArena";
 import GMMode from "./components/GMMode";
@@ -23,6 +24,7 @@ export default function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [score, setScore] = useState(null);
   const [toast, setToast] = useState(null);
+  const [theme, setThemeState] = useState(getTheme());
 
   const refreshScore = useCallback(() => {
     if (!user) {
@@ -53,6 +55,14 @@ export default function App() {
           <span className="tag">Out-coach the coach</span>
         </div>
         <div className="topbar-right">
+          <button
+            className="theme-toggle"
+            onClick={() => setThemeState(toggleTheme())}
+            title="Toggle light / dark"
+            aria-label="Toggle light or dark theme"
+          >
+            {theme === "light" ? "🌙" : "☀️"}
+          </button>
           {user ? (
             <>
               <div
@@ -131,7 +141,7 @@ export default function App() {
         Oaksy<span style={{ color: "var(--accent)" }}>.</span> — the arena where fans
         out-coach the coach, and settle it with data.
         {" · "}
-        <a href="/landing.html" style={{ color: "var(--gold)" }}>
+        <a href="/landing.html" style={{ color: "var(--gold-text)" }}>
           Get launch updates
         </a>
       </footer>

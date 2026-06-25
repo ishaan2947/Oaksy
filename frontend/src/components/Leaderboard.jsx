@@ -26,7 +26,7 @@ export default function Leaderboard({ highlight }) {
         >
           <span className={`lb-rank ${i < 3 ? "top" : ""}`}>{i + 1}</span>
           <span className="lb-name">{r.display_name}</span>
-          <span className="lb-rate" style={{ color: "var(--green)" }}>
+          <span className="lb-rate" style={{ color: "var(--green-text)" }}>
             {r.win_rate}%
           </span>
           <span className="lb-calls">{r.total_calls} calls</span>

@@ -10,6 +10,20 @@
     />
   </head>
   <body>
+    <script>
+      // Set the theme before paint to avoid a flash of the wrong one.
+      (function () {
+        try {
+          var t = localStorage.getItem("oaksy_theme");
+          if (t !== "light" && t !== "dark") {
+            t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          }
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

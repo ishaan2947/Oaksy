@@ -38,13 +38,13 @@ export default function CoachScore({ user, score, onLogin }) {
 
         <div className="score-grid">
           <div className="score-tile">
-            <div className="n" style={{ color: "var(--green)" }}>
+            <div className="n" style={{ color: "var(--green-text)" }}>
               {score.win_rate}%
             </div>
             <div className="l">Win rate vs coaches</div>
           </div>
           <div className="score-tile">
-            <div className="n" style={{ color: "var(--accent)" }}>
+            <div className="n" style={{ color: "var(--accent-text)" }}>
               {score.current_streak > 0 ? `🔥 ${score.current_streak}` : "—"}
             </div>
             <div className="l">
@@ -52,7 +52,7 @@ export default function CoachScore({ user, score, onLogin }) {
             </div>
           </div>
           <div className="score-tile">
-            <div className="n" style={{ color: "var(--gold)" }}>
+            <div className="n" style={{ color: "var(--gold-text)" }}>
               {score.beat_coach_count}
             </div>
             <div className="l">Times you beat the coach</div>
@@ -66,7 +66,7 @@ export default function CoachScore({ user, score, onLogin }) {
             <div className="l">Debate votes won</div>
           </div>
           <div className="score-tile">
-            <div className="n" style={{ color: "var(--blue)" }}>
+            <div className="n" style={{ color: "var(--blue-text)" }}>
               {score.gm_teams > 0 ? score.gm_rating : "—"}
             </div>
             <div className="l">GM rating · {score.gm_rank_label}</div>

@@ -3,43 +3,49 @@ from __future__ import annotations
 
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from .. import schemas, services
-from ..database import get_db
+from ..database import SessionLocal, get_db
 from ..deps import get_optional_user
 from ..models import Pick, Situation, User
 
 router = APIRouter(prefix="/api/situations", tags=["situations"])
 
-# The Daily Call is identical for every user all day, so cache the (answer-free)
-# payload per (sport, date). This takes the hottest read fully off the database
-# under load. Keyed by date, so it self-refreshes each morning.
-_daily_cache: dict[tuple[str, str], schemas.SituationOut] = {}
+# The Daily Call is identical for every user all day. Cache the (answer-free)
+# payload PRE-SERIALIZED to JSON bytes per (sport, date). On a hit we serve it
+# straight from the async event loop — no DB session, no thread pool, no
+# re-serialization — so the hottest read scales to very high concurrency.
+# Keyed by date, so it self-refreshes each morning.
+_daily_cache: dict[tuple[str, str], bytes] = {}
+
+
+def _build_daily(sport: str, today: date, key: tuple[str, str]) -> bytes | None:
+    """Cache miss path (runs once per day per worker): hit the DB, cache bytes."""
+    with SessionLocal() as db:
+        situation = services.get_or_assign_daily(db, sport, today)
+        if not situation:
+            return None
+        body = services.situation_out(situation).model_dump_json().encode()
+    if len(_daily_cache) > 64:  # keep the cache from growing unbounded
+        _daily_cache.clear()
+    _daily_cache[key] = body
+    return body
 
 
 @router.get("/daily", response_model=schemas.SituationOut)
-def daily_call(
-    sport: str = Query(default="NFL"),
-    db: Session = Depends(get_db),
-):
+async def daily_call(sport: str = Query(default="NFL")):
     """Today's Daily Call for a sport. Answer fields are never included here."""
-    today = date.today()
-    key = (sport.upper(), today.isoformat())
-    cached = _daily_cache.get(key)
-    if cached is not None:
-        return cached
-
-    situation = services.get_or_assign_daily(db, sport, today)
-    if not situation:
-        raise HTTPException(404, f"No situations available for {sport.upper()}")
-    payload = services.situation_out(situation)
-    if len(_daily_cache) > 64:  # keep the cache from growing unbounded
-        _daily_cache.clear()
-    _daily_cache[key] = payload
-    return payload
+    key = (sport.upper(), date.today().isoformat())
+    body = _daily_cache.get(key)
+    if body is None:
+        body = await run_in_threadpool(_build_daily, sport, date.today(), key)
+        if body is None:
+            raise HTTPException(404, f"No situations available for {sport.upper()}")
+    return Response(content=body, media_type="application/json")
 
 
 @router.get("/{situation_id}", response_model=schemas.SituationOut)

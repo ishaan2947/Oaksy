@@ -1,8 +1,10 @@
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
+import { getTheme, toggleTheme } from "./theme";
 
 function Landing() {
+  const [theme, setThemeState] = useState(getTheme());
   const [email, setEmail] = useState("");
   const [state, setState] = useState("idle"); // idle | busy | done | error
   const [count, setCount] = useState(null);
@@ -42,9 +44,19 @@ function Landing() {
         <span className="lp-brand">
           Oaksy<span style={{ color: "var(--accent)" }}>.</span>
         </span>
-        <a className="btn ghost" href="/">
-          Play now →
-        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button
+            className="theme-toggle"
+            onClick={() => setThemeState(toggleTheme())}
+            title="Toggle light / dark"
+            aria-label="Toggle light or dark theme"
+          >
+            {theme === "light" ? "🌙" : "☀️"}
+          </button>
+          <a className="btn ghost" href="/">
+            Play now →
+          </a>
+        </div>
       </header>
 
       <section className="lp-hero">
