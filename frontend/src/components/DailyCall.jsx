@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import Timer from "./Timer";
 import RevealCard from "./RevealCard";
+import FieldDiagram from "./FieldDiagram";
 
 // NFL-only for the stranger test — NBA decision moments tested as "mushy" in
 // early feedback. Re-add "NBA" here to bring the sport toggle back.
@@ -92,6 +93,7 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
       )}
 
       <div className="card">
+        <FieldDiagram sport={situation.sport} />
         <div className="eyebrow">
           <span className="sport">{situation.sport}</span>
           <span>The Daily Call</span>

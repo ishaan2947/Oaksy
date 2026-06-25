@@ -582,3 +582,11 @@ a.btn { text-decoration: none; display: inline-block; }
 }
 .fb-submit { width: 100%; }
 .fb-thanks { font-weight: 700; line-height: 1.5; color: var(--ink); padding: 6px 0; }
+
+/* Scenario visual (inline SVG field/court at the top of the Daily Call card) */
+.scenario-art {
+  display: block; width: 100%; height: 104px; border-radius: 11px;
+  border: 1px solid var(--line); margin-bottom: 16px; overflow: hidden;
+  background: var(--bg);
+}
+@media (max-width: 560px) { .scenario-art { height: 84px; } }
