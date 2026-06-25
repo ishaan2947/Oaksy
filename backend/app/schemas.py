@@ -113,6 +113,13 @@ class PickRequest(BaseModel):
 
 
 # --- Coach Score ------------------------------------------------------------
+class BadgeOut(BaseModel):
+    id: str
+    label: str
+    description: str
+    earned: bool
+
+
 class CoachScore(BaseModel):
     display_name: str
     total_calls: int
@@ -123,8 +130,11 @@ class CoachScore(BaseModel):
     rank_label: str
     current_streak: int = 0    # consecutive days with a Daily Call
     longest_streak: int = 0
+    survivor_current: int = 0  # consecutive correct calls (resets on a miss)
+    survivor_best: int = 0
     sharp_score: float = 50.0  # 0-100 calibration: confident+right up, confident+wrong down
     sharp_label: str = "Unrated"
+    badges: list[BadgeOut] = []
     gm_teams: int = 0
     gm_rating: float = 0.0     # 0-100 average Claude team score
     gm_rank_label: str = "Unrated"

@@ -45,6 +45,7 @@ export default function RevealCard({ options, reveal, coachScore, confidence, on
   }
 
   const streak = coachScore?.current_streak;
+  const survivor = coachScore?.survivor_current || 0;
 
   // "How you stacked up" — share of the crowd that found the data's call.
   // Pure social proof from the community split; shown once enough have played.
@@ -187,11 +188,15 @@ export default function RevealCard({ options, reveal, coachScore, confidence, on
         )}
       </div>
 
-      {streak > 0 && (
+      {survivor >= 2 && reveal.you_were_correct ? (
+        <div className="streak-nudge">
+          ⚡ {survivor} calls right in a row — don't break it.
+        </div>
+      ) : streak > 0 ? (
         <div className="streak-nudge">
           🔥 {streak}-day streak — a fresh call drops every morning. Keep it alive.
         </div>
-      )}
+      ) : null}
 
       <ShareCard
         reveal={reveal}

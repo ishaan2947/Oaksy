@@ -52,6 +52,14 @@ export default function CoachScore({ user, score, onLogin }) {
             </div>
           </div>
           <div className="score-tile">
+            <div className="n" style={{ color: "var(--red-text)" }}>
+              {score.survivor_current > 0 ? `⚡ ${score.survivor_current}` : "—"}
+            </div>
+            <div className="l">
+              Survivor{score.survivor_best > 0 ? ` · best ${score.survivor_best}` : ""}
+            </div>
+          </div>
+          <div className="score-tile">
             <div className="n" style={{ color: "var(--gold-text)" }}>
               {score.beat_coach_count}
             </div>
@@ -82,6 +90,32 @@ export default function CoachScore({ user, score, onLogin }) {
             <div className="l">82-0 teams built</div>
           </div>
         </div>
+
+        {score.badges?.length > 0 && (
+          <div className="badges">
+            <div className="badges-head">
+              <h4 className="block-label">Badges</h4>
+              <span className="badges-count">
+                {score.badges.filter((b) => b.earned).length}/{score.badges.length}
+              </span>
+            </div>
+            <div className="badges-grid">
+              {[...score.badges]
+                .sort((a, b) => Number(b.earned) - Number(a.earned))
+                .map((b) => (
+                  <div
+                    key={b.id}
+                    className={`badge-card ${b.earned ? "earned" : "locked"}`}
+                    title={b.description}
+                  >
+                    <span className="badge-ico">{b.earned ? "🏅" : "🔒"}</span>
+                    <span className="badge-name">{b.label}</span>
+                    <span className="badge-desc">{b.description}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={{ marginTop: 22 }}>

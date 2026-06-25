@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from .. import schemas
 from ..database import get_db
 from ..deps import get_current_user
-from ..models import DebateVote, GMTeam, Pick, User
+from ..models import DebateVote, GMTeam, Pick, Situation, User
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
@@ -83,6 +83,45 @@ def _sharp_score(db: Session, user: User) -> tuple[float, str]:
     return score, _sharp_label(score, len(rows))
 
 
+def _survivor(correct_flags: list[bool]) -> tuple[int, int]:
+    """(current, best) run of consecutive correct calls. Current is the trailing
+    run from the most recent pick — one miss resets it (the loss-aversion hook)."""
+    best = run = 0
+    for c in correct_flags:
+        run = run + 1 if c else 0
+        best = max(best, run)
+    current = 0
+    for c in reversed(correct_flags):
+        if c:
+            current += 1
+        else:
+            break
+    return current, best
+
+
+def _badges(m: dict) -> list[schemas.BadgeOut]:
+    """Achievement badges derived from the user's record. (id, label, desc, test)."""
+    defs = [
+        ("first_call", "First Call", "Make your first Daily Call", m["total"] >= 1),
+        ("regular", "Regular", "Make 10 calls", m["total"] >= 10),
+        ("centurion", "Centurion", "Make 100 calls", m["total"] >= 100),
+        ("coach_killer", "Coach Killer", "Beat the coach once", m["beat"] >= 1),
+        ("out_coacher", "Out-Coacher", "Beat the coach 10 times", m["beat"] >= 10),
+        ("on_a_roll", "On a Roll", "Hit a 3-day streak", m["longest_streak"] >= 3),
+        ("habit", "Habit Formed", "Hit a 7-day streak", m["longest_streak"] >= 7),
+        ("survivor", "Survivor", "Get 5 calls right in a row", m["survivor_best"] >= 5),
+        ("untouchable", "Untouchable", "Get 10 calls right in a row", m["survivor_best"] >= 10),
+        ("sharp", "Sharp Shooter", "Reach a Sharp Score of 80", m["sharp_score"] >= 80 and m["graded"] >= 3),
+        ("three_sport", "Three-Sport Coach", "Make a call in NFL, NBA, and MLB", m["sports"] >= 3),
+        ("architect", "Roster Architect", "Build an 82-0 team", m["gm_teams"] >= 1),
+        ("crowd_favorite", "Crowd Favorite", "Win a debate upvote", m["debate_wins"] >= 1),
+    ]
+    return [
+        schemas.BadgeOut(id=i, label=l, description=d, earned=bool(t))
+        for (i, l, d, t) in defs
+    ]
+
+
 def _gm_rank_label(rating: float, teams: int) -> str:
     if teams == 0:
         return "Unrated"
@@ -140,7 +179,46 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
     ).all()
     current_streak, longest_streak = _streaks([dt.date() for dt in pick_dts if dt])
 
+    # Survivor: consecutive correct calls, in chronological order.
+    correct_flags = [
+        bool(c)
+        for c in db.scalars(
+            select(Pick.correct).where(Pick.user_id == user.id).order_by(Pick.created_at)
+        ).all()
+    ]
+    survivor_current, survivor_best = _survivor(correct_flags)
+
+    # Distinct sports played (for the Three-Sport Coach badge).
+    sport_count = (
+        db.scalar(
+            select(func.count(func.distinct(Situation.sport)))
+            .select_from(Pick)
+            .join(Situation, Pick.situation_id == Situation.id)
+            .where(Pick.user_id == user.id)
+        )
+        or 0
+    )
+
     sharp_score, sharp_label = _sharp_score(db, user)
+    graded = db.scalar(
+        select(func.count(Pick.id)).where(
+            Pick.user_id == user.id, Pick.confidence.is_not(None)
+        )
+    ) or 0
+
+    badges = _badges(
+        {
+            "total": total,
+            "beat": beat,
+            "longest_streak": longest_streak,
+            "survivor_best": survivor_best,
+            "sharp_score": sharp_score,
+            "graded": graded,
+            "sports": sport_count,
+            "gm_teams": gm_teams,
+            "debate_wins": debate_wins,
+        }
+    )
 
     win_rate = round((correct / total) * 100, 1) if total else 0.0
     return schemas.CoachScore(
@@ -153,8 +231,11 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
         rank_label=_rank_label(win_rate, total),
         current_streak=current_streak,
         longest_streak=longest_streak,
+        survivor_current=survivor_current,
+        survivor_best=survivor_best,
         sharp_score=sharp_score,
         sharp_label=sharp_label,
+        badges=badges,
         gm_teams=gm_teams,
         gm_rating=gm_rating,
         gm_rank_label=_gm_rank_label(gm_rating, gm_teams),
