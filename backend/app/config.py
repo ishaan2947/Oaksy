@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     # hidden and the endpoint is disabled. Set to your OAuth 2.0 Web client ID.
     google_client_id: str = ""
 
+    # Reminder emails (Resend). All optional — empty => reminders are disabled.
+    resend_api_key: str = ""
+    reminder_from: str = "Oaksy <onboarding@resend.dev>"
+    reminders_token: str = ""  # shared secret the daily cron must present
+    app_base_url: str = "https://oaksy.onrender.com"
+
     # CORS — comma-separated origins.
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 

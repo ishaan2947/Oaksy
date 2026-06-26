@@ -23,6 +23,7 @@ logger = logging.getLogger("oaksy.seed")
 _ADDED_COLUMNS: dict[str, list[tuple[str, str]]] = {
     "situations": [("option_d", "ALTER TABLE situations ADD COLUMN option_d VARCHAR")],
     "picks": [("confidence", "ALTER TABLE picks ADD COLUMN confidence INTEGER")],
+    "users": [("reminders", "ALTER TABLE users ADD COLUMN reminders BOOLEAN")],
 }
 
 

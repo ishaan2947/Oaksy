@@ -92,6 +92,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String)
     password_hash: Mapped[str] = mapped_column(String)
+    # Opt-in for streak reminder emails. Nullable so the migration can add it to
+    # existing rows; NULL is treated as opted-in.
+    reminders: Mapped[bool | None] = mapped_column(Boolean, default=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     picks: Mapped[list["Pick"]] = relationship(back_populates="user")

@@ -86,6 +86,8 @@ export const api = {
   // Coach Score + leaderboard
   myScore: () => request("/api/users/me/score", { auth: true }),
   leaderboard: () => request("/api/users/leaderboard"),
+  setReminders: (enabled) =>
+    request("/api/users/me/reminders", { method: "PUT", auth: true, body: { enabled } }),
 
   // Debate Arena
   debate: () => request("/api/debate/current"),

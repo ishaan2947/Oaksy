@@ -19,6 +19,7 @@ from .routers import (
     feedback,
     gm,
     picks,
+    reminders,
     scores,
     situations,
     users,
@@ -63,6 +64,7 @@ app.include_router(waitlist.router)
 app.include_router(feedback.router)
 app.include_router(scores.router)
 app.include_router(challenges.router)
+app.include_router(reminders.router)
 
 
 @app.get("/api/health", tags=["health"])

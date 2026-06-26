@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { api } from "../api";
 import Leaderboard from "./Leaderboard";
 
 // The identity layer — your running record vs real coaches.
@@ -118,10 +120,49 @@ export default function CoachScore({ user, score, onLogin }) {
         )}
       </div>
 
+      <ReminderToggle initial={score.reminders} />
+
       <div style={{ marginTop: 22 }}>
         <div className="section-title">This week's top coaches</div>
         <Leaderboard highlight={score.display_name} />
       </div>
     </>
+  );
+}
+
+function ReminderToggle({ initial }) {
+  const [on, setOn] = useState(initial !== false);
+  const [busy, setBusy] = useState(false);
+
+  async function toggle() {
+    const next = !on;
+    setOn(next); // optimistic
+    setBusy(true);
+    try {
+      await api.setReminders(next);
+    } catch {
+      setOn(!next); // revert on failure
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card reminder-row">
+      <div>
+        <div className="reminder-title">Streak reminders</div>
+        <div className="reminder-sub">Email me when my streak's at risk so I don't break the chain.</div>
+      </div>
+      <button
+        className={`switch ${on ? "on" : ""}`}
+        onClick={toggle}
+        disabled={busy}
+        role="switch"
+        aria-checked={on}
+        aria-label="Streak reminder emails"
+      >
+        <span className="knob" />
+      </button>
+    </div>
   );
 }

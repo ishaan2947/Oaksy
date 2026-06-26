@@ -240,6 +240,7 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
         sharp_score=sharp_score,
         sharp_label=sharp_label,
         badges=badges,
+        reminders=user.reminders is not False,
         gm_teams=gm_teams,
         gm_rating=gm_rating,
         gm_rank_label=_gm_rank_label(gm_rating, gm_teams),
@@ -249,6 +250,17 @@ def _coach_score(db: Session, user: User) -> schemas.CoachScore:
 @router.get("/me/score", response_model=schemas.CoachScore)
 def my_score(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     return _coach_score(db, user)
+
+
+@router.put("/me/reminders")
+def set_reminders(
+    payload: schemas.ReminderPref,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    user.reminders = payload.enabled
+    db.commit()
+    return {"reminders": payload.enabled}
 
 
 @router.get("/leaderboard", response_model=list[schemas.LeaderboardEntry])

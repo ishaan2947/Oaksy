@@ -1,0 +1,22 @@
+name: Daily streak reminders
+
+# Pings the prod reminders endpoint once a day to email opted-in users whose
+# streak is at risk. Needs a repo secret REMINDERS_TOKEN matching the same value
+# set on the Render service. Does nothing until RESEND_API_KEY is also set there.
+on:
+  schedule:
+    - cron: "0 16 * * *" # 16:00 UTC daily (adjust to taste)
+  workflow_dispatch: {} # lets you run it manually from the Actions tab
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger reminder send
+        run: |
+          code=$(curl -sS -o /tmp/out.txt -w "%{http_code}" -X POST \
+            "https://oaksy.onrender.com/api/reminders/run" \
+            -H "X-Reminders-Token: ${{ secrets.REMINDERS_TOKEN }}")
+          echo "HTTP $code"
+          cat /tmp/out.txt
+          test "$code" = "200"

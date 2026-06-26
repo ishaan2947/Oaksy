@@ -135,9 +135,14 @@ class CoachScore(BaseModel):
     sharp_score: float = 50.0  # 0-100 calibration: confident+right up, confident+wrong down
     sharp_label: str = "Unrated"
     badges: list[BadgeOut] = []
+    reminders: bool = True      # opted in to streak reminder emails
     gm_teams: int = 0
     gm_rating: float = 0.0     # 0-100 average Claude team score
     gm_rank_label: str = "Unrated"
+
+
+class ReminderPref(BaseModel):
+    enabled: bool
 
 
 class LeaderboardEntry(BaseModel):
