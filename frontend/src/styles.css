@@ -405,6 +405,39 @@ a { color: var(--blue-text); }
   font-size: 13.5px; font-weight: 600; color: var(--ink);
 }
 
+/* --------------------------- Challenge a friend ------------------------- */
+.challenge-banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 16px; padding: 12px 16px; border-radius: 14px;
+  background: var(--panel-2); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+  font-size: 14px; color: var(--ink-dim); line-height: 1.45;
+}
+.challenge-banner b { color: var(--ink); }
+.cb-tag {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink-contrast); background: var(--accent); padding: 3px 9px; border-radius: 999px;
+  flex: none;
+}
+.challenge-banner .linkbtn { margin-left: auto; }
+
+.reveal-actions {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px;
+}
+.h2h { margin-top: 18px; }
+.h2h-rows { display: grid; gap: 8px; margin-top: 4px; }
+.h2h-row {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+  border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line);
+}
+.h2h-row.win { border-color: var(--green); background: var(--green-deep); }
+.h2h-who { font-weight: 800; color: var(--ink); min-width: 84px; }
+.h2h-pick { color: var(--ink-dim); font-size: 14px; flex: 1; min-width: 0; }
+.h2h-mark { margin-left: auto; font-weight: 700; font-size: 13px; color: var(--ink-dim); }
+.h2h-row.win .h2h-mark { color: var(--green-text); }
+.h2h-result {
+  margin-top: 12px; text-align: center; font-size: 16px; font-weight: 800; color: var(--ink);
+}
+
 /* ----------------------------- Live scores ------------------------------ */
 .live-pill {
   margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: 0.04em;

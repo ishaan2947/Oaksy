@@ -27,6 +27,24 @@ export default function App() {
   const [score, setScore] = useState(null);
   const [toast, setToast] = useState(null);
   const [theme, setThemeState] = useState(getTheme());
+  const [challenge, setChallenge] = useState(null);
+
+  // Someone opened a challenge link (?c=ID): load it and jump to the right tab.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("c");
+    if (!id) return;
+    api
+      .getChallenge(id)
+      .then((ch) => {
+        setChallenge(ch);
+        setTab(ch.kind === "gm" ? "gm" : "daily");
+      })
+      .catch(() => {})
+      .finally(() => {
+        // Clean the URL so a refresh doesn't replay the challenge.
+        window.history.replaceState({}, "", window.location.pathname);
+      });
+  }, []);
 
   const refreshScore = useCallback(() => {
     if (!user) {
@@ -119,6 +137,8 @@ export default function App() {
               coachScore={score}
               onPicked={refreshScore}
               onToast={showToast}
+              challenge={challenge?.kind === "daily" ? challenge : null}
+              onExitChallenge={() => setChallenge(null)}
             />
           )}
           {tab === "scores" && <LiveScores />}
@@ -129,7 +149,15 @@ export default function App() {
               onToast={showToast}
             />
           )}
-          {tab === "gm" && <GMMode onSubmitted={refreshScore} onToast={showToast} />}
+          {tab === "gm" && (
+            <GMMode
+              onSubmitted={refreshScore}
+              onToast={showToast}
+              coachScore={score}
+              challenge={challenge?.kind === "gm" ? challenge : null}
+              onExitChallenge={() => setChallenge(null)}
+            />
+          )}
           {tab === "score" && (
             <CoachScore user={user} score={score} onLogin={() => setShowAuth(true)} />
           )}

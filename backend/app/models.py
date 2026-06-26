@@ -189,6 +189,31 @@ class WaitlistEntry(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class Challenge(Base):
+    """A head-to-head challenge link: the creator's result snapshot on a Daily
+    Call situation or an 82-0 GM spin, for a friend to try to beat."""
+
+    __tablename__ = "challenges"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)  # short share token
+    kind: Mapped[str] = mapped_column(String)  # "daily" | "gm"
+    challenger_name: Mapped[str] = mapped_column(String)
+
+    # Daily Call challenge
+    situation_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    choice: Mapped[str | None] = mapped_column(String, nullable=True)
+    confidence: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    correct: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    beat_coach: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+
+    # 82-0 GM challenge
+    spin_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    player_ids: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class DebateVote(Base):
     """An upvote on a pick's reasoning in the weekly Debate Arena."""
 

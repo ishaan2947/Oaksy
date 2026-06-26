@@ -16,7 +16,15 @@ const SPORT_TEASER = {
   MLB: "A real managerial decision from an MLB game.",
 };
 
-export default function DailyCall({ sport, onSport, coachScore, onPicked, onToast }) {
+export default function DailyCall({
+  sport,
+  onSport,
+  coachScore,
+  onPicked,
+  onToast,
+  challenge,
+  onExitChallenge,
+}) {
   const [situation, setSituation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +40,6 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
   const [timeUp, setTimeUp] = useState(false);
 
   const load = useCallback(() => {
-    setLoading(true);
     setError(null);
     setPhase("intro");
     setReveal(null);
@@ -40,12 +47,19 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
     setConfidence(2);
     setPickedConfidence(null);
     setTimeUp(false);
+    if (challenge) {
+      // Challenge mode: play the exact situation the friend was challenged on.
+      setSituation(challenge.situation);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     api
       .daily(sport)
       .then((s) => setSituation(s))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [sport]);
+  }, [sport, challenge]);
 
   useEffect(() => {
     load();
@@ -85,6 +99,28 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
     setTimeUp(true);
   }
 
+  async function challengeFriend() {
+    try {
+      const { id } = await api.createChallenge({
+        kind: "daily",
+        situation_id: situation.id,
+        choice: reveal.your_choice,
+        confidence: pickedConfidence || undefined,
+        challenger_name: coachScore?.display_name || "A challenger",
+      });
+      const url = `${window.location.origin}${window.location.pathname}?c=${id}`;
+      const text = "Can you out-coach me on today's Oaksy call?";
+      if (navigator.share) {
+        await navigator.share({ title: "Oaksy", text, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        onToast?.("Challenge link copied — send it to a friend.");
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") onToast?.(e.message || "Couldn't create challenge");
+    }
+  }
+
   if (loading) return <div className="spinner">Loading today's call…</div>;
   if (error)
     return (
@@ -96,20 +132,35 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
       </div>
     );
 
+  const opt = (k) => situation?.options.find((o) => o.key === k)?.label || k?.toUpperCase();
+
   return (
     <>
-      {SPORTS.length > 1 && (
-        <div className="tabs" style={{ marginBottom: 16 }}>
-          {SPORTS.map((s) => (
-            <button
-              key={s}
-              className={`tab ${s === sport ? "active" : ""}`}
-              onClick={() => onSport(s)}
-            >
-              {s}
-            </button>
-          ))}
+      {challenge ? (
+        <div className="challenge-banner">
+          <span className="cb-tag">⚔️ Challenge</span>
+          <span>
+            <b>{challenge.challenger_name}</b> challenged you — they went with{" "}
+            <b>{opt(challenge.challenger_choice)}</b>. Can you do better?
+          </span>
+          <button className="linkbtn" onClick={onExitChallenge}>
+            Play today's instead
+          </button>
         </div>
+      ) : (
+        SPORTS.length > 1 && (
+          <div className="tabs" style={{ marginBottom: 16 }}>
+            {SPORTS.map((s) => (
+              <button
+                key={s}
+                className={`tab ${s === sport ? "active" : ""}`}
+                onClick={() => onSport(s)}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )
       )}
 
       <div className="card">
@@ -122,14 +173,16 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
 
         {phase === "intro" ? (
           <div className="intro">
-            <h2 className="intro-title">Make the call before the coach did.</h2>
+            <h2 className="intro-title">
+              {challenge ? `Beat ${challenge.challenger_name}'s call.` : "Make the call before the coach did."}
+            </h2>
             <p className="intro-sub">
               {SPORT_TEASER[situation.sport] || "A real coaching decision."} You'll
               get the situation and 30 seconds on the clock — then see the real call,
               what the data said, and how the crowd voted.
             </p>
             <button className="btn primary intro-start" onClick={begin}>
-              Start today's call →
+              {challenge ? "Take the challenge →" : "Start today's call →"}
             </button>
             <p className="intro-foot">No account needed. ~30 seconds.</p>
           </div>
@@ -205,13 +258,57 @@ export default function DailyCall({ sport, onSport, coachScore, onPicked, onToas
         )}
       </div>
 
+      {phase === "reveal" && challenge && reveal && (
+        <HeadToHead reveal={reveal} challenge={challenge} optLabel={opt} />
+      )}
+
       {phase === "reveal" && (
-        <div className="center" style={{ marginTop: 18 }}>
-          <button className="btn" onClick={load}>
-            Next call →
-          </button>
+        <div className="reveal-actions">
+          {!challenge && reveal?.your_choice && (
+            <button className="btn primary" onClick={challengeFriend}>
+              ⚔️ Challenge a friend
+            </button>
+          )}
+          {challenge ? (
+            <button className="btn" onClick={onExitChallenge}>
+              Play today's call →
+            </button>
+          ) : (
+            <button className="btn" onClick={load}>
+              Next call →
+            </button>
+          )}
         </div>
       )}
     </>
+  );
+}
+
+function HeadToHead({ reveal, challenge, optLabel }) {
+  const themCorrect = challenge.challenger_choice === reveal.best_call;
+  const youCorrect = !!reveal.you_were_correct;
+  const result =
+    youCorrect === themCorrect
+      ? "Dead even — you both made the same verdict."
+      : youCorrect
+      ? "You win this one. 🏆"
+      : `${challenge.challenger_name} takes it.`;
+  return (
+    <div className="card h2h">
+      <h4 className="block-label">Head to head</h4>
+      <div className="h2h-rows">
+        <div className={`h2h-row ${youCorrect ? "win" : ""}`}>
+          <span className="h2h-who">You</span>
+          <span className="h2h-pick">{optLabel(reveal.your_choice)}</span>
+          <span className="h2h-mark">{youCorrect ? "✓ data's call" : "✗ missed"}</span>
+        </div>
+        <div className={`h2h-row ${themCorrect ? "win" : ""}`}>
+          <span className="h2h-who">{challenge.challenger_name}</span>
+          <span className="h2h-pick">{optLabel(challenge.challenger_choice)}</span>
+          <span className="h2h-mark">{themCorrect ? "✓ data's call" : "✗ missed"}</span>
+        </div>
+      </div>
+      <div className="h2h-result">{result}</div>
+    </div>
   );
 }

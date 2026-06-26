@@ -212,6 +212,37 @@ class GMResultOut(BaseModel):
     share_line: str
 
 
+# --- Challenge a friend -----------------------------------------------------
+class ChallengeCreate(BaseModel):
+    kind: str = Field(pattern="^(daily|gm)$")
+    challenger_name: str = Field(default="A challenger", max_length=40)
+    # daily
+    situation_id: str | None = None
+    choice: str | None = Field(default=None, pattern="^[abcd]$")
+    confidence: int | None = Field(default=None, ge=1, le=3)
+    # gm
+    spin_id: str | None = None
+    player_ids: list[str] | None = Field(default=None, max_length=8)
+    score: int | None = Field(default=None, ge=0, le=100)
+
+
+class ChallengeCreated(BaseModel):
+    id: str
+
+
+class ChallengeOut(BaseModel):
+    id: str
+    kind: str
+    challenger_name: str
+    # daily
+    situation: SituationOut | None = None
+    challenger_choice: str | None = None
+    challenger_confidence: int | None = None
+    # gm
+    spin: SpinOut | None = None
+    challenger_score: int | None = None
+
+
 # --- Waitlist ---------------------------------------------------------------
 class WaitlistRequest(BaseModel):
     email: EmailStr

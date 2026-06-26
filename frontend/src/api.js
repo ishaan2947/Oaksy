@@ -79,6 +79,10 @@ export const api = {
   // Live scores
   scores: (sport) => request(`/api/scores?sport=${encodeURIComponent(sport)}`),
 
+  // Challenge a friend
+  createChallenge: (body) => request("/api/challenges", { method: "POST", body }),
+  getChallenge: (id) => request(`/api/challenges/${encodeURIComponent(id)}`),
+
   // Coach Score + leaderboard
   myScore: () => request("/api/users/me/score", { auth: true }),
   leaderboard: () => request("/api/users/leaderboard"),

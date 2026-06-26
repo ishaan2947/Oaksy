@@ -1,11 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api";
 
-export default function GMMode({ onSubmitted, onToast }) {
-  const [spin, setSpin] = useState(null);
+export default function GMMode({ onSubmitted, onToast, coachScore, challenge, onExitChallenge }) {
+  const [spin, setSpin] = useState(challenge?.spin || null);
   const [selected, setSelected] = useState([]); // ordered list of player ids
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
+
+  // Challenge mode: build from the exact spin pool the friend was challenged on.
+  useEffect(() => {
+    if (challenge?.spin) {
+      setSpin(challenge.spin);
+      setSelected([]);
+      setResult(null);
+    }
+  }, [challenge]);
+
+  async function challengeFriend() {
+    if (!spin || !result) return;
+    try {
+      const { id } = await api.createChallenge({
+        kind: "gm",
+        spin_id: spin.spin_id,
+        player_ids: result.team.map((p) => p.id),
+        score: result.score,
+        challenger_name: coachScore?.display_name || "A challenger",
+      });
+      const url = `${window.location.origin}${window.location.pathname}?c=${id}`;
+      const text = `My 82-0 team scored ${result.score}/100. Same player pool — can you beat it?`;
+      if (navigator.share) await navigator.share({ title: "Oaksy 82-0", text, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        onToast?.("Challenge link copied — send it to a friend.");
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") onToast?.(e.message || "Couldn't create challenge");
+    }
+  }
 
   async function doSpin() {
     setBusy(true);
@@ -56,7 +87,16 @@ export default function GMMode({ onSubmitted, onToast }) {
 
   // ---- Result screen ----
   if (result) {
-    return <GMResult result={result} onAgain={doSpin} onToast={onToast} />;
+    return (
+      <GMResult
+        result={result}
+        onAgain={doSpin}
+        onToast={onToast}
+        challenge={challenge}
+        onChallenge={challengeFriend}
+        onExitChallenge={onExitChallenge}
+      />
+    );
   }
 
   // ---- Intro (no spin yet) ----
@@ -90,6 +130,18 @@ export default function GMMode({ onSubmitted, onToast }) {
   // ---- Build screen ----
   return (
     <div className="card">
+      {challenge && (
+        <div className="challenge-banner" style={{ marginBottom: 14 }}>
+          <span className="cb-tag">⚔️ Challenge</span>
+          <span>
+            <b>{challenge.challenger_name}</b> scored{" "}
+            <b>{challenge.challenger_score}/100</b> from this exact pool. Beat it.
+          </span>
+          <button className="linkbtn" onClick={onExitChallenge}>
+            Free play instead
+          </button>
+        </div>
+      )}
       <div className="eyebrow">
         <span className="sport">NBA</span>
         <span>82-0 GM Mode</span>
@@ -161,9 +213,18 @@ export default function GMMode({ onSubmitted, onToast }) {
   );
 }
 
-function GMResult({ result, onAgain, onToast }) {
+function GMResult({ result, onAgain, onToast, challenge, onChallenge, onExitChallenge }) {
   const grade =
     result.score >= 90 ? "win" : result.score >= 70 ? "neutral" : "loss";
+  const themScore = challenge?.challenger_score;
+  const h2hLine =
+    themScore == null
+      ? null
+      : result.score > themScore
+      ? `You win — ${result.score} to ${themScore}. 🏆`
+      : result.score < themScore
+      ? `${challenge.challenger_name} wins — ${themScore} to ${result.score}.`
+      : `Dead tie at ${result.score}.`;
 
   async function share() {
     const text = `${result.share_line} oaksyapp.com`;
@@ -204,6 +265,23 @@ function GMResult({ result, onAgain, onToast }) {
         <div className="cap-label" style={{ marginTop: 10 }}>
           Team cost: <b>{result.total_cost}</b> / {result.cap}
         </div>
+
+        {h2hLine && (
+          <div className="h2h" style={{ marginTop: 14 }}>
+            <h4 className="block-label">Head to head</h4>
+            <div className="h2h-rows">
+              <div className={`h2h-row ${result.score >= themScore ? "win" : ""}`}>
+                <span className="h2h-who">You</span>
+                <span className="h2h-mark">{result.score}/100</span>
+              </div>
+              <div className={`h2h-row ${themScore > result.score ? "win" : ""}`}>
+                <span className="h2h-who">{challenge.challenger_name}</span>
+                <span className="h2h-mark">{themScore}/100</span>
+              </div>
+            </div>
+            <div className="h2h-result">{h2hLine}</div>
+          </div>
+        )}
       </div>
 
       <div className="sharecard" style={{ marginTop: 18 }}>
@@ -227,12 +305,21 @@ function GMResult({ result, onAgain, onToast }) {
       </div>
 
       <div className="share-actions">
-        <button className="btn primary" onClick={share}>
+        <button className="btn primary" onClick={onChallenge}>
+          ⚔️ Challenge a friend
+        </button>
+        <button className="btn ghost" onClick={share}>
           Share team
         </button>
-        <button className="btn ghost" onClick={onAgain}>
-          🎲 Spin again
-        </button>
+        {challenge ? (
+          <button className="btn ghost" onClick={onExitChallenge}>
+            Free play →
+          </button>
+        ) : (
+          <button className="btn ghost" onClick={onAgain}>
+            🎲 Spin again
+          </button>
+        )}
       </div>
     </>
   );

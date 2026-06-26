@@ -1,7 +1,7 @@
 """Coach Score (identity layer) and the weekly leaderboard."""
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import case, func, select
@@ -27,8 +27,11 @@ def _rank_label(win_rate: float, total: int) -> str:
     return "Benchwarmer"
 
 
-def _streaks(pick_dates: list[date]) -> tuple[int, int]:
-    """Return (current, longest) run of consecutive days from a list of dates."""
+def _streaks(pick_dates: list[date], today: date | None = None) -> tuple[int, int]:
+    """Return (current, longest) run of consecutive days from a list of dates.
+
+    `today` is injectable for testing; it defaults to the UTC date so it matches
+    how `created_at` is stored (the "played today" check stays consistent)."""
     days = sorted(set(pick_dates))
     if not days:
         return 0, 0
@@ -40,7 +43,8 @@ def _streaks(pick_dates: list[date]) -> tuple[int, int]:
 
     # Current streak counts back from the most recent day, but only "alive" if the
     # last play was today or yesterday (a full missed day breaks it).
-    today = date.today()
+    if today is None:
+        today = datetime.now(timezone.utc).date()
     if days[-1] not in (today, today - timedelta(days=1)):
         return 0, longest
     current = 1

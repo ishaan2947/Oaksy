@@ -12,7 +12,18 @@ from fastapi.staticfiles import StaticFiles
 
 from . import __version__
 from .config import settings
-from .routers import auth, debates, feedback, gm, picks, scores, situations, users, waitlist
+from .routers import (
+    auth,
+    challenges,
+    debates,
+    feedback,
+    gm,
+    picks,
+    scores,
+    situations,
+    users,
+    waitlist,
+)
 from .seed import create_tables, seed_situations
 
 logging.basicConfig(level=logging.INFO)
@@ -51,6 +62,7 @@ app.include_router(gm.router)
 app.include_router(waitlist.router)
 app.include_router(feedback.router)
 app.include_router(scores.router)
+app.include_router(challenges.router)
 
 
 @app.get("/api/health", tags=["health"])
