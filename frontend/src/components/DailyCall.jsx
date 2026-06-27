@@ -34,6 +34,7 @@ export default function DailyCall({
   const [phase, setPhase] = useState("intro");
   const [reveal, setReveal] = useState(null);
   const [reasoning, setReasoning] = useState("");
+  const [selected, setSelected] = useState(null); // option chosen, not yet locked in
   const [confidence, setConfidence] = useState(2); // 1 lean · 2 confident · 3 lock it
   const [pickedConfidence, setPickedConfidence] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -44,6 +45,7 @@ export default function DailyCall({
     setPhase("intro");
     setReveal(null);
     setReasoning("");
+    setSelected(null);
     setConfidence(2);
     setPickedConfidence(null);
     setTimeUp(false);
@@ -228,12 +230,13 @@ export default function DailyCall({
                   {situation.options.map((o) => (
                     <button
                       key={o.key}
-                      className="option"
+                      className={`option ${selected === o.key ? "sel" : ""}`}
                       disabled={submitting}
-                      onClick={() => pick(o.key)}
+                      onClick={() => setSelected(o.key)}
                     >
                       <span className="key">{o.key.toUpperCase()}</span>
                       <span>{o.label}</span>
+                      {selected === o.key && <span className="opt-check">✓</span>}
                     </button>
                   ))}
                 </div>
@@ -244,6 +247,17 @@ export default function DailyCall({
                   maxLength={600}
                   onChange={(e) => setReasoning(e.target.value)}
                 />
+                <button
+                  className="btn primary lock-in"
+                  disabled={!selected || submitting}
+                  onClick={() => pick(selected)}
+                >
+                  {submitting
+                    ? "Locking in…"
+                    : selected
+                    ? "Lock in my call →"
+                    : "Pick an option above"}
+                </button>
               </>
             ) : (
               <RevealCard

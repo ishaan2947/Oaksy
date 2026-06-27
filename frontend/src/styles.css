@@ -316,6 +316,15 @@ nav.tabs { flex-wrap: wrap; } /* the main nav has many tabs — wrap on narrow s
 .option:hover:not(:disabled) .key { border-color: var(--accent); color: var(--accent); }
 .option.picked { border-color: var(--gold); }
 .option:disabled { cursor: default; }
+/* Selected (not yet locked in) on the Daily Call */
+.option.sel {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, var(--panel-2));
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.option.sel .key { border-color: var(--accent); color: var(--accent-text); }
+.opt-check { margin-left: auto; color: var(--accent-text); font-weight: 900; font-size: 16px; }
+.lock-in { width: 100%; margin-top: 14px; }
 
 /* result coloring */
 .option.best { border-color: var(--green); background: var(--green-deep); }
