@@ -112,6 +112,26 @@ class PickRequest(BaseModel):
     anon_id: str | None = None  # used when not logged in
 
 
+# --- Gauntlet (endless survival mode) ---------------------------------------
+class GauntletGradeRequest(BaseModel):
+    situation_id: str
+    choice: str = Field(pattern="^[abcd]$")
+
+
+class GauntletResultOut(BaseModel):
+    situation_id: str
+    your_choice: str
+    correct: bool
+    best_call: str
+    best_call_label: str
+    actual_call: str
+    actual_call_label: str
+    win_probabilities: dict[str, int] | None = None
+    ai_verdict: str
+    outcome: str
+    matchup: str | None = None
+
+
 # --- Coach Score ------------------------------------------------------------
 class BadgeOut(BaseModel):
     id: str
@@ -277,3 +297,15 @@ class FeedbackSummary(BaseModel):
     maybe: int = 0
     no: int = 0
     total: int = 0
+
+
+# --- User-study survey (temporary) ------------------------------------------
+class SurveyRequest(BaseModel):
+    answers: dict[str, str | int | None]
+    anon_id: str | None = None
+
+
+class SurveySummary(BaseModel):
+    count: int = 0
+    averages: dict[str, float] = {}
+    responses: list[dict] = []

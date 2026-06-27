@@ -83,6 +83,16 @@ export const api = {
   createChallenge: (body) => request("/api/challenges", { method: "POST", body }),
   getChallenge: (id) => request(`/api/challenges/${encodeURIComponent(id)}`),
 
+  // Gauntlet (endless mode)
+  gauntletNext: (seen) =>
+    request(`/api/gauntlet/next?seen=${encodeURIComponent(seen.join(","))}`),
+  gauntletGrade: (situation_id, choice) =>
+    request("/api/gauntlet/grade", { method: "POST", body: { situation_id, choice } }),
+
+  // Survey (temporary user study)
+  submitSurvey: (answers) =>
+    request("/api/survey", { method: "POST", body: { answers, anon_id: anonId() } }),
+
   // Coach Score + leaderboard
   myScore: () => request("/api/users/me/score", { auth: true }),
   leaderboard: () => request("/api/users/leaderboard"),

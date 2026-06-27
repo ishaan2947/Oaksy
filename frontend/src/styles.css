@@ -405,6 +405,66 @@ a { color: var(--blue-text); }
   font-size: 13.5px; font-weight: 600; color: var(--ink);
 }
 
+/* ------------------------------ Gauntlet -------------------------------- */
+.gauntlet-intro { text-align: center; padding: 12px 6px; }
+.gauntlet-best-big { font-size: 16px; font-weight: 800; color: var(--accent-text); margin: 4px 0 18px; }
+
+.gauntlet-hud {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; padding: 0 4px;
+}
+.hud-run { display: flex; align-items: baseline; gap: 8px; }
+.hud-flame { font-size: 22px; }
+.hud-num {
+  font-family: var(--mono); font-size: 34px; font-weight: 900; color: var(--ink);
+  font-variant-numeric: tabular-nums; line-height: 1;
+}
+.hud-cap { font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+.hud-best { font-size: 13px; font-weight: 700; color: var(--ink-dim); }
+
+.gauntlet-over { text-align: center; padding: 24px 16px; }
+.run-final {
+  font-family: var(--mono); font-size: 72px; font-weight: 900; color: var(--accent);
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+.run-final-label { font-size: 15px; color: var(--ink-dim); margin-top: 4px; }
+.gauntlet-best { margin-top: 10px; font-weight: 800; color: var(--ink); }
+.miss-card {
+  margin-top: 20px; text-align: left; padding: 16px;
+  border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line);
+}
+.miss-line { font-size: 15px; color: var(--ink-dim); line-height: 1.5; }
+.miss-line b { color: var(--ink); }
+.miss-line b.data { color: var(--green-text); }
+
+/* ------------------------------- Survey --------------------------------- */
+.survey-head { text-align: center; margin-bottom: 20px; }
+.survey-head h2 { margin: 10px 0 6px; }
+.survey-badge {
+  font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-contrast); background: var(--accent); padding: 3px 10px; border-radius: 999px;
+}
+.survey-q { margin-bottom: 22px; }
+.survey-label { font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+.scale { display: flex; gap: 8px; }
+.scale-dot {
+  flex: 1; height: 46px; border-radius: 10px; font-family: var(--mono); font-weight: 800;
+  font-size: 16px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink-dim);
+  transition: all 0.12s;
+}
+.scale-dot.sel { background: var(--accent); border-color: var(--accent); color: #1a0c04; }
+.scale-ends { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--ink-faint); }
+.survey-modes { display: flex; flex-wrap: wrap; gap: 8px; }
+.mode-chip {
+  padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: var(--panel-2); border: 1px solid var(--line); color: var(--ink-dim);
+}
+.mode-chip.sel { background: var(--ink); border-color: var(--ink); color: var(--ink-contrast); }
+.survey .reasoning { margin-top: 0; }
+.survey-done { text-align: center; padding: 40px 20px; }
+.survey-check { font-size: 44px; }
+.survey-done h2 { margin: 12px 0 8px; }
+
 /* --------------------------- Challenge a friend ------------------------- */
 .challenge-banner {
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;

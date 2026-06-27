@@ -17,11 +17,13 @@ from .routers import (
     challenges,
     debates,
     feedback,
+    gauntlet,
     gm,
     picks,
     reminders,
     scores,
     situations,
+    survey,
     users,
     waitlist,
 )
@@ -65,6 +67,8 @@ app.include_router(feedback.router)
 app.include_router(scores.router)
 app.include_router(challenges.router)
 app.include_router(reminders.router)
+app.include_router(gauntlet.router)
+app.include_router(survey.router)
 
 
 @app.get("/api/health", tags=["health"])

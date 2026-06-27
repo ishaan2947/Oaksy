@@ -8,15 +8,19 @@ import GMMode from "./components/GMMode";
 import CoachScore from "./components/CoachScore";
 import Leaderboard from "./components/Leaderboard";
 import LiveScores from "./components/LiveScores";
+import Gauntlet from "./components/Gauntlet";
+import Survey from "./components/Survey";
 import AuthModal from "./components/AuthModal";
 import FeedbackWidget from "./components/FeedbackWidget";
 
 const TABS = [
   { id: "daily", label: "Daily Call" },
+  { id: "gauntlet", label: "⚡ Gauntlet" },
   { id: "scores", label: "Scores" },
   { id: "debate", label: "Debate" },
   { id: "gm", label: "GM Mode" },
   { id: "score", label: "Coach Score" },
+  { id: "survey", label: "Survey" }, // temporary — remove after the user study
 ];
 
 export default function App() {
@@ -141,7 +145,9 @@ export default function App() {
               onExitChallenge={() => setChallenge(null)}
             />
           )}
+          {tab === "gauntlet" && <Gauntlet onToast={showToast} />}
           {tab === "scores" && <LiveScores />}
+          {tab === "survey" && <Survey onToast={showToast} />}
           {tab === "debate" && (
             <DebateArena
               user={user}

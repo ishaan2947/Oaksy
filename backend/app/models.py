@@ -181,6 +181,17 @@ class FeedbackEntry(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class SurveyResponse(Base):
+    """A response to the temporary in-app user-study survey."""
+
+    __tablename__ = "survey_responses"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=_uuid)
+    anon_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    answers: Mapped[dict] = mapped_column(JSON)  # {question_id: value}
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class WaitlistEntry(Base):
     """A pre-launch / mobile-beta email signup from the landing page."""
 
