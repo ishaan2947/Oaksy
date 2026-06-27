@@ -21,7 +21,7 @@ const TABS = [
   { id: "debate", label: "Debate" },
   { id: "gm", label: "GM Mode" },
   { id: "score", label: "Coach Score" },
-  { id: "survey", label: "Survey" }, // temporary — remove after the user study
+  { id: "survey", label: "📣 Survey", cls: "tab-survey" }, // temporary — remove after the user study
 ];
 
 export default function App() {
@@ -128,7 +128,7 @@ export default function App() {
             {TABS.map((t) => (
               <button
                 key={t.id}
-                className={`tab ${tab === t.id ? "active" : ""}`}
+                className={`tab ${t.cls || ""} ${tab === t.id ? "active" : ""}`}
                 onClick={() => setTab(t.id)}
               >
                 {t.label}

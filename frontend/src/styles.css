@@ -219,6 +219,21 @@ nav.tabs { flex-wrap: wrap; } /* the main nav has many tabs — wrap on narrow s
 .tab.active { background: var(--ink); color: var(--ink-contrast); border-color: var(--ink); }
 .tab:hover:not(.active) { color: var(--ink); border-color: var(--ink-faint); }
 
+/* Temporary survey tab — red so testers spot it */
+.tab.tab-survey {
+  color: var(--red-text); border-color: color-mix(in srgb, var(--red) 55%, var(--line));
+  animation: survey-pulse 2.2s ease-in-out infinite;
+}
+.tab.tab-survey:hover:not(.active) { color: var(--red-text); border-color: var(--red); }
+.tab.tab-survey.active {
+  background: var(--red); border-color: var(--red); color: #fff; animation: none;
+}
+@keyframes survey-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 40%, transparent); }
+  50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .tab.tab-survey { animation: none; } }
+
 /* ----------------------------- Buttons ---------------------------------- */
 .btn {
   background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
