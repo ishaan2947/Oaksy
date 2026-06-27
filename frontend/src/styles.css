@@ -88,8 +88,63 @@ body {
 button { font-family: inherit; cursor: pointer; }
 a { color: var(--blue-text); }
 
+/* --------------------------- Immersive ambient -------------------------- */
+/* A cursor-following spotlight + slow-drifting sports line-art that parallaxes
+   on scroll, behind the content. Compositor-friendly and motion-safe. */
+.ambient {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  color: var(--ink); will-change: transform;
+  transform: translate3d(0, calc(var(--scrolly, 0) * -0.04px), 0);
+}
+.ambient .orb {
+  position: absolute; opacity: 0.05; color: inherit;
+  animation: drift 26s ease-in-out infinite;
+}
+:root[data-theme="light"] .ambient .orb { opacity: 0.06; }
+.orb.o1 { width: 240px; top: 8%; left: -60px; animation-duration: 30s; }
+.orb.o2 { width: 200px; top: 42%; right: -50px; left: auto; animation-duration: 38s; animation-delay: -6s; color: var(--accent); }
+.orb.o3 { width: 170px; bottom: 6%; left: 4%; animation-duration: 34s; animation-delay: -12s; }
+.orb.o4 { width: 150px; top: 18%; right: 8%; left: auto; animation-duration: 42s; animation-delay: -3s; }
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -26px, 0) rotate(8deg); }
+}
+
+.spotlight {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(
+    520px circle at var(--mx, 50%) var(--my, 30%),
+    color-mix(in srgb, var(--accent) 12%, transparent), transparent 42%
+  );
+  transition: background 0.12s linear;
+}
+
+.click-ripple {
+  position: fixed; z-index: 9998; pointer-events: none;
+  width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%;
+  border: 2px solid var(--accent); opacity: 0.7;
+  animation: ripple 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes ripple {
+  to { transform: scale(7); opacity: 0; }
+}
+
+/* Cards gently rise in when they appear (per tab switch) */
+.card { animation: card-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes card-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient, .spotlight { display: none; }
+  .card, .reveal { animation: none; }
+}
+@media (max-width: 560px) {
+  .orb.o2, .orb.o4 { display: none; } /* declutter on small screens */
+  .orb.o1 { width: 180px; }
+  .orb.o3 { width: 130px; }
+}
+
 /* ----------------------------- Layout ----------------------------------- */
-.app { max-width: 760px; margin: 0 auto; padding: 0 18px 40px; }
+.app { max-width: 760px; margin: 0 auto; padding: 0 18px 40px; position: relative; z-index: 1; }
 
 .shell { display: block; }
 .main-col { min-width: 0; }
@@ -154,9 +209,11 @@ a { color: var(--blue-text); }
 
 /* ----------------------------- Tabs ------------------------------------- */
 .tabs { display: flex; gap: 6px; margin: 8px 0 22px; }
+nav.tabs { flex-wrap: wrap; } /* the main nav has many tabs — wrap on narrow screens */
 .tab {
-  flex: 1; background: transparent; border: 1px solid var(--line);
-  color: var(--ink-dim); padding: 11px 0; border-radius: 12px;
+  flex: 1 1 auto; min-width: 84px; white-space: nowrap;
+  background: transparent; border: 1px solid var(--line);
+  color: var(--ink-dim); padding: 11px 10px; border-radius: 12px;
   font-weight: 700; font-size: 14px; transition: all 0.15s;
 }
 .tab.active { background: var(--ink); color: var(--ink-contrast); border-color: var(--ink); }

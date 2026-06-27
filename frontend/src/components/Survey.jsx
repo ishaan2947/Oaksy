@@ -13,6 +13,7 @@ const SCALES = [
 const TEXTS = [
   { id: "best", label: "What's the best thing about it?", ph: "What clicked for you…" },
   { id: "worst", label: "What's confusing, annoying, or just bad?", ph: "Be brutal — it helps most…" },
+  { id: "bugs", label: "Anything broken, buggy, or glitchy? (what + where)", ph: "Tell me what broke so I can fix it…" },
   { id: "missing", label: "What would make you use it every single day?", ph: "The one thing that's missing…" },
 ];
 

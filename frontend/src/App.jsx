@@ -10,6 +10,7 @@ import Leaderboard from "./components/Leaderboard";
 import LiveScores from "./components/LiveScores";
 import Gauntlet from "./components/Gauntlet";
 import Survey from "./components/Survey";
+import Ambient from "./components/Ambient";
 import AuthModal from "./components/AuthModal";
 import FeedbackWidget from "./components/FeedbackWidget";
 
@@ -71,6 +72,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <Ambient />
       <header className="topbar">
         <div className="brand">
           <h1>
