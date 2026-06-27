@@ -235,16 +235,38 @@ nav.tabs { flex-wrap: wrap; } /* the main nav has many tabs — wrap on narrow s
 @media (prefers-reduced-motion: reduce) { .tab.tab-survey { animation: none; } }
 
 /* ----------------------------- Buttons ---------------------------------- */
+/* Springy hover (slight overshoot ease = a refined "pop") + a tactile press. */
 .btn {
   background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
   padding: 11px 16px; border-radius: 12px; font-weight: 700; font-size: 14px;
-  transition: all 0.15s;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
 }
-.btn:hover { border-color: var(--ink-faint); }
+.btn:hover:not(:disabled) {
+  border-color: var(--ink-faint); transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+.btn:active:not(:disabled) { transform: translateY(0) scale(0.97); transition-duration: 0.07s; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #1a0c04; }
-.btn.primary:hover { filter: brightness(1.08); }
-.btn.ghost { background: transparent; }
+.btn.primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 34%, transparent);
+}
+.btn.ghost { background: transparent; box-shadow: none; }
+.btn.ghost:hover:not(:disabled) { box-shadow: none; }
 .btn:disabled { opacity: 0.45; cursor: default; }
+
+/* Tactile press on the other interactive chips/tiles */
+.tab:active:not(.active), .option:active:not(:disabled),
+.scale-dot:active, .conf-chip:active, .mode-chip:active,
+.argue-chip:active, .vote:active {
+  transform: scale(0.96); transition: transform 0.07s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .option { transition: border-color 0.15s ease, filter 0.15s ease; }
+  .btn:hover:not(:disabled), .btn:active:not(:disabled) { transform: none; box-shadow: none; }
+}
 
 /* ----------------------------- Daily Call ------------------------------- */
 .card {
